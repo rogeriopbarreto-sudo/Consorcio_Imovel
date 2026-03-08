@@ -71,8 +71,15 @@ def probabilidade_zona(limite=ZONA_ALTA_CHANCE, total_cotas=TOTAL_COTAS):
     return qtd / total_cotas
 
 
-st.set_page_config(page_title="Monitor de Consórcio Imobiliário", layout="centered")
-st.title("Monitor de Consórcio Imobiliário")
+st.set_page_config(
+    page_title="Monitor de Consórcio Imobiliário - Rogerio Barreto",
+    layout="centered"
+)
+
+st.markdown(
+    "<h1 style='color:red;'>Monitor de Consórcio Imobiliário - Rogerio Barreto</h1>",
+    unsafe_allow_html=True
+)
 
 try:
     concurso, data, numero = buscar_resultado()
@@ -89,6 +96,7 @@ try:
 
     st.subheader("Comparação com a sua cota")
     st.write(f"**Minha cota:** {MINHA_COTA:04d}")
+    st.write(f"**Numero Loteria** {numero}")
     st.write(f"**Distância até a cota sorteada:** {distancia}")
 
     if chance == "ALTA CHANCE":
