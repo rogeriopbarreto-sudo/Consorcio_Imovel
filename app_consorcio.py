@@ -96,7 +96,7 @@ try:
 
     st.subheader("Comparação com a sua cota")
     st.write(f"**Minha cota:** {MINHA_COTA:04d}")
-    st.write(f"**Numero Loteria** {numero}")
+    st.write(f"**Cota Contemplada** {cota_contemplada:04d}")
     st.write(f"**Distância até a cota sorteada:** {distancia}")
 
     if chance == "ALTA CHANCE":
@@ -123,4 +123,5 @@ try:
     st.plotly_chart(fig, use_container_width=True)
 
 except Exception as e:
+
     st.error(f"Erro ao obter resultado: {e}")
