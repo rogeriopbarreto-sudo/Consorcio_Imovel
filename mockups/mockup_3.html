@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mockup 3 — Tetris · Consórcios Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  :root{
+    --bg:#0a0a1a;--grid:#12122a;--ink:#e8e8ff;--dim:#7878aa;
+    --cyan:#00f0f0;--yellow:#f0f000;--green:#00f000;--red:#f00060;--orange:#f0a000;--purple:#a000f0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    font-family:'VT323',monospace;background:var(--bg);color:var(--ink);min-height:100dvh;overflow-x:hidden;
+    background-image:
+      linear-gradient(rgba(120,120,255,.06) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(120,120,255,.06) 1px,transparent 1px);
+    background-size:24px 24px;
+  }
+  .wrap{max-width:480px;margin:0 auto;padding:26px 16px 60px}
+  .crt{position:fixed;inset:0;pointer-events:none;z-index:9;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0 2px,transparent 2px 4px)}
+
+  h1{font-family:'Press Start 2P';font-size:clamp(14px,4.6vw,20px);line-height:1.6;text-align:center;
+    color:var(--cyan);text-shadow:3px 3px 0 var(--red);margin-bottom:4px}
+  .sub{text-align:center;font-size:18px;color:var(--dim);margin-bottom:20px}
+
+  .well{
+    background:var(--grid);border:3px solid var(--cyan);border-radius:4px;
+    box-shadow:0 0 24px rgba(0,240,240,.25), inset 0 0 40px rgba(0,0,0,.6);
+    padding:16px 10px 12px;margin-bottom:18px;position:relative;overflow:hidden;
+  }
+  .well-label{font-family:'Press Start 2P';font-size:8px;color:var(--yellow);margin:0 0 14px 6px;letter-spacing:.1em}
+  .row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .row .ord{font-family:'Press Start 2P';font-size:9px;color:var(--dim);width:24px}
+  .cells{display:flex;gap:5px;flex:1;justify-content:center}
+  .cell{
+    width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+    font-family:'Press Start 2P';font-size:16px;
+    background:#0c0c20;border:1px solid #22224a;color:transparent;
+  }
+  .cell.set{border:none;box-shadow:inset -4px -4px 0 rgba(0,0,0,.35), inset 4px 4px 0 rgba(255,255,255,.25)}
+  .cell.c0.set{background:var(--cyan);color:#003}
+  .cell.c1.set{background:var(--orange);color:#300}
+  .cell.c2.set{background:var(--green);color:#030}
+  .cell.c3.set{background:var(--purple);color:#fff}
+  .cell.c4.set{background:var(--yellow);color:#330}
+  .cell.mil.set{outline:3px solid #fff;outline-offset:-3px}
+  .row .lbl{font-size:15px;color:var(--dim);width:48px;text-align:right;line-height:1.1}
+
+  .score{display:flex;gap:12px;margin-bottom:18px}
+  .panel{flex:1;background:var(--grid);border:3px solid var(--purple);border-radius:4px;padding:14px 12px;
+    box-shadow:0 0 18px rgba(160,0,240,.2)}
+  .panel.v{border-color:var(--green);box-shadow:0 0 18px rgba(0,240,0,.18)}
+  .p-title{font-family:'Press Start 2P';font-size:8px;color:var(--ink);margin-bottom:10px;line-height:1.7}
+  .p-line{font-size:17px;color:var(--dim);line-height:1.35}
+  .p-line b{color:var(--ink)}
+  .p-big{font-family:'Press Start 2P';font-size:22px;margin:8px 0 4px}
+  .p-big.miss{color:var(--red);text-shadow:0 0 12px rgba(240,0,96,.6)}
+  .p-big.close{color:var(--green);text-shadow:0 0 12px rgba(0,240,0,.6)}
+  .blink{animation:blink 1s steps(2) infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  .nextbox{background:var(--grid);border:3px solid var(--yellow);border-radius:4px;padding:14px;
+    display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;
+    box-shadow:0 0 18px rgba(240,240,0,.15)}
+  .nextbox .t{font-family:'Press Start 2P';font-size:8px;line-height:1.7;color:var(--yellow)}
+  .nextbox .d{font-family:'Press Start 2P';font-size:16px;color:var(--ink)}
+
+  .btns{display:flex;gap:12px}
+  button{
+    flex:1;font-family:'Press Start 2P';font-size:10px;padding:16px 8px;cursor:pointer;
+    background:var(--grid);color:var(--cyan);border:3px solid var(--cyan);border-radius:4px;
+    box-shadow:0 5px 0 #066;transition:transform .1s, box-shadow .1s;
+  }
+  button:active{transform:translateY(4px);box-shadow:0 1px 0 #066}
+  button.b2{color:var(--yellow);border-color:var(--yellow);box-shadow:0 5px 0 #660}
+  button.b2:active{box-shadow:0 1px 0 #660}
+  footer{margin-top:24px;text-align:center;font-size:15px;color:var(--dim);line-height:1.5}
+</style>
+</head>
+<body>
+<div class="crt"></div>
+<div class="wrap">
+  <h1>CONSÓRCIO<br>TETRIS</h1>
+  <div class="sub">LOTERIA FEDERAL · 16/05/2026 · CONC. 5876</div>
+
+  <div class="well">
+    <div class="well-label">▼ EXTRAÇÃO EM ANDAMENTO…</div>
+    <div id="rows"></div>
+  </div>
+
+  <div class="score">
+    <div class="panel">
+      <div class="p-title">🏠 IMÓVEL<br>G.000760 C.3311</div>
+      <div class="p-line">números: <b>3311 6644 9977</b></div>
+      <div class="p-big miss">MISS</div>
+      <div class="p-line">dist. mínima <b>4</b> (6640→6644)</div>
+    </div>
+    <div class="panel v">
+      <div class="p-title">🚗 VEÍCULO<br>G.01633 C.974</div>
+      <div class="p-line">centena sorteada: <b>975</b></div>
+      <div class="p-big close blink">QUASE!</div>
+      <div class="p-line">dist. <b>1</b> — um acima da sua</div>
+    </div>
+  </div>
+
+  <div class="nextbox">
+    <span class="t">NEXT<br>LEVEL</span>
+    <span class="d">17/06 IMÓVEL</span>
+  </div>
+
+  <div class="btns">
+    <button>↻ ATUALIZAR</button>
+    <button class="b2">CALENDÁRIO</button>
+  </div>
+
+  <footer>análise matemática · não substitui<br>a confirmação oficial da ademicon</footer>
+</div>
+
+<script>
+const premios=['58694','03317','96640','11972','40975'];
+const rows=document.getElementById('rows');
+premios.forEach((p,i)=>{
+  const r=document.createElement('div');r.className='row';
+  r.innerHTML=`<span class="ord">${i+1}º</span>
+    <div class="cells">${[...p].map((d,j)=>
+      `<div class="cell c${i}${j>0?' mil':''}" data-d="${d}" id="cell-${i}-${j}"></div>`).join('')}</div>
+    <span class="lbl">milhar<br>${p.slice(1)}</span>`;
+  rows.appendChild(r);
+});
+
+// Tetris drop: each digit falls from above into its cell
+let delay=0.3;
+premios.forEach((p,i)=>{
+  [...p].forEach((d,j)=>{
+    const cell=document.getElementById(`cell-${i}-${j}`);
+    setTimeout(()=>{
+      cell.classList.add('set');cell.textContent=d;
+      const well=document.querySelector('.well').getBoundingClientRect();
+      const drop=cell.getBoundingClientRect().top-well.top+50;
+      gsap.from(cell,{y:-drop,duration:.34,ease:'power2.in',
+        onComplete:()=>gsap.fromTo(cell,{scaleY:.78},{scaleY:1,duration:.16,ease:'back.out(3)'})});
+    },delay*1000);
+    delay+=0.18;
+  });
+  delay+=0.25;
+});
+gsap.from('.wrap > *',{y:20,opacity:0,duration:.6,stagger:.08,ease:'power2.out'});
+</script>
+</body>
+</html>

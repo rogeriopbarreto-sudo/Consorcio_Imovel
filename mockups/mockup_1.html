@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mockup 1 — Aurora · Consórcios Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  :root{
+    --bg:#06070f;
+    --ink:#eef0ff;
+    --dim:#8a8fb5;
+    --aurora-1:#34f5c5;
+    --aurora-2:#7b5cff;
+    --aurora-3:#ff5c9d;
+    --glass:rgba(255,255,255,.055);
+    --glass-border:rgba(255,255,255,.12);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);
+    overflow-x:hidden;min-height:100dvh;
+  }
+  #bg{position:fixed;inset:0;z-index:0}
+  .veil{position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(ellipse 120% 60% at 50% -10%,transparent 30%,rgba(6,7,15,.85) 90%);}
+  .wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:28px 20px 60px}
+
+  header{margin-bottom:28px}
+  .kicker{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--aurora-1);font-weight:500}
+  h1{font-family:'Unbounded',sans-serif;font-size:clamp(26px,8vw,34px);font-weight:800;line-height:1.08;margin-top:10px}
+  h1 em{font-style:normal;background:linear-gradient(90deg,var(--aurora-1),var(--aurora-2),var(--aurora-3));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .next{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:13px;color:var(--dim)}
+  .pulse{width:8px;height:8px;border-radius:50%;background:var(--aurora-1);box-shadow:0 0 12px var(--aurora-1);animation:pulse 2s infinite}
+  @keyframes pulse{50%{opacity:.35}}
+
+  .card{
+    background:var(--glass);border:1px solid var(--glass-border);border-radius:22px;
+    padding:22px;margin-bottom:18px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    position:relative;overflow:hidden;
+  }
+  .card::before{content:'';position:absolute;inset:0;border-radius:22px;padding:1px;
+    background:linear-gradient(135deg,rgba(255,255,255,.18),transparent 40%);
+    -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+  .card-label{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--dim);margin-bottom:14px}
+
+  .premios{display:flex;flex-direction:column;gap:9px}
+  .premio{display:flex;align-items:center;gap:14px}
+  .premio .ord{font-family:'Unbounded';font-size:11px;color:var(--dim);width:22px}
+  .premio .num{font-family:'Unbounded';font-size:20px;font-weight:600;letter-spacing:.14em}
+  .premio .num b{color:var(--aurora-1);font-weight:800}
+  .premio .tag{margin-left:auto;font-size:10px;color:var(--dim);letter-spacing:.1em}
+  .data-extr{margin-top:14px;font-size:12px;color:var(--dim)}
+
+  .cons-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .cons-title{font-family:'Unbounded';font-size:15px;font-weight:600}
+  .badge{font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:5px 11px;border-radius:99px;font-weight:600}
+  .badge.nao{background:rgba(255,92,157,.13);color:var(--aurora-3);border:1px solid rgba(255,92,157,.3)}
+  .badge.perto{background:rgba(52,245,197,.12);color:var(--aurora-1);border:1px solid rgba(52,245,197,.3)}
+  .cons-sub{font-size:12px;color:var(--dim);margin-bottom:16px}
+  .meus-nums{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .chip{font-family:'Unbounded';font-size:14px;font-weight:600;padding:8px 14px;border-radius:12px;
+    background:rgba(123,92,255,.14);border:1px solid rgba(123,92,255,.35);color:#c9bcff}
+  .dist{display:flex;align-items:baseline;gap:10px}
+  .dist .n{font-family:'Unbounded';font-size:44px;font-weight:800;
+    background:linear-gradient(180deg,var(--ink),var(--dim));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .dist.hot .n{background:linear-gradient(180deg,var(--aurora-1),#0a8f6e);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .dist .lbl{font-size:12px;color:var(--dim);max-width:180px;line-height:1.45}
+
+  .actions{display:flex;gap:12px;margin-top:8px}
+  button{
+    flex:1;font-family:'Outfit';font-size:14px;font-weight:600;padding:16px;border-radius:16px;
+    border:none;cursor:pointer;transition:transform .15s;
+  }
+  button:active{transform:scale(.97)}
+  .btn-main{background:linear-gradient(90deg,var(--aurora-1),var(--aurora-2));color:#06070f}
+  .btn-ghost{background:var(--glass);border:1px solid var(--glass-border);color:var(--ink)}
+  footer{margin-top:28px;text-align:center;font-size:11px;color:var(--dim);line-height:1.6}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="veil"></div>
+<div class="wrap">
+  <header>
+    <div class="kicker">Consórcios Control · Ademicon</div>
+    <h1>Loteria<br>Federal <em>ao vivo</em></h1>
+    <div class="next"><span class="pulse"></span> Próxima extração: <b style="color:var(--ink)">17/06 · Imóvel</b></div>
+  </header>
+
+  <div class="card" data-anim>
+    <div class="card-label">Resultado · Extração 16/05/2026</div>
+    <div class="premios">
+      <div class="premio"><span class="ord">1º</span><span class="num">5<b>8694</b></span><span class="tag">milhar 8694</span></div>
+      <div class="premio"><span class="ord">2º</span><span class="num">0<b>3317</b></span><span class="tag">milhar 3317</span></div>
+      <div class="premio"><span class="ord">3º</span><span class="num">9<b>6640</b></span><span class="tag">milhar 6640</span></div>
+      <div class="premio"><span class="ord">4º</span><span class="num">1<b>1972</b></span><span class="tag">milhar 1972</span></div>
+      <div class="premio"><span class="ord">5º</span><span class="num">4<b>0975</b></span><span class="tag">milhar 0975</span></div>
+    </div>
+    <div class="data-extr">Fonte: Caixa · concurso 5876</div>
+  </div>
+
+  <div class="card" data-anim>
+    <div class="cons-head">
+      <span class="cons-title">🏠 Imóvel</span>
+      <span class="badge nao">Não contemplado</span>
+    </div>
+    <div class="cons-sub">Grupo 000760 · Cota 3311</div>
+    <div class="meus-nums"><span class="chip">3311</span><span class="chip">6644</span><span class="chip">9977</span></div>
+    <div class="dist">
+      <span class="n">4</span>
+      <span class="lbl">de distância — o 3º prêmio tirou <b>6640</b>, seu equivalente é <b>6644</b></span>
+    </div>
+  </div>
+
+  <div class="card" data-anim>
+    <div class="cons-head">
+      <span class="cons-title">🚗 Veículo</span>
+      <span class="badge perto">Por um número!</span>
+    </div>
+    <div class="cons-sub">Grupo 01633 · Cota 974 · Próxima extração 08/07</div>
+    <div class="meus-nums"><span class="chip">974</span></div>
+    <div class="dist hot">
+      <span class="n">1</span>
+      <span class="lbl">de distância — o 5º prêmio tirou centena <b>975</b>, logo acima da sua <b>974</b></span>
+    </div>
+  </div>
+
+  <div class="actions" data-anim>
+    <button class="btn-main">Atualizar agora</button>
+    <button class="btn-ghost">Calendário</button>
+  </div>
+
+  <footer>Análise matemática baseada nos regulamentos.<br>Não substitui a confirmação oficial da Ademicon.</footer>
+</div>
+
+<script>
+// ---- three.js: aurora particle field ----
+const canvas=document.getElementById('bg');
+const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(60,1,.1,100);
+camera.position.z=8;
+const N=900,pos=new Float32Array(N*3),col=new Float32Array(N*3);
+const palette=[[0.2,0.96,0.77],[0.48,0.36,1.0],[1.0,0.36,0.62]];
+for(let i=0;i<N;i++){
+  pos[i*3]=(Math.random()-.5)*16;
+  pos[i*3+1]=(Math.random()-.5)*22;
+  pos[i*3+2]=(Math.random()-.5)*8;
+  const c=palette[Math.floor(Math.random()*3)];
+  col[i*3]=c[0];col[i*3+1]=c[1];col[i*3+2]=c[2];
+}
+const geo=new THREE.BufferGeometry();
+geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+geo.setAttribute('color',new THREE.BufferAttribute(col,3));
+const mat=new THREE.PointsMaterial({size:.05,vertexColors:true,transparent:true,opacity:.8,
+  blending:THREE.AdditiveBlending,depthWrite:false});
+const pts=new THREE.Points(geo,mat);scene.add(pts);
+function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+addEventListener('resize',resize);resize();
+let t=0;
+(function loop(){
+  t+=.0035;
+  pts.rotation.y=t*.4;
+  pts.rotation.x=Math.sin(t*.6)*.12;
+  const p=geo.attributes.position.array;
+  for(let i=0;i<N;i++){p[i*3+1]+=Math.sin(t*2+i)*0.0015;}
+  geo.attributes.position.needsUpdate=true;
+  renderer.render(scene,camera);
+  requestAnimationFrame(loop);
+})();
+
+// ---- GSAP entrance ----
+gsap.from('header > *',{y:24,opacity:0,duration:.9,stagger:.12,ease:'power3.out'});
+gsap.from('[data-anim]',{y:40,opacity:0,duration:.9,stagger:.16,delay:.3,ease:'power3.out'});
+gsap.from('.premio',{x:-18,opacity:0,duration:.6,stagger:.09,delay:.7,ease:'power2.out'});
+</script>
+</body>
+</html>

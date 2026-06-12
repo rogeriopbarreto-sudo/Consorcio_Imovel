@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mockup 2 — Suspense · Consórcios Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  :root{
+    --bg:#0d0a14;--stage:#16101f;--ink:#f5f1ff;--dim:#9b90b8;
+    --gold:#ffc94d;--red:#ff4d6d;--green:#3ddc97;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Manrope',sans-serif;background:
+    radial-gradient(ellipse 80% 50% at 50% 0%,#241636 0%,var(--bg) 60%);
+    color:var(--ink);min-height:100dvh;overflow-x:hidden}
+  .wrap{max-width:480px;margin:0 auto;padding:30px 20px 60px;position:relative;z-index:2}
+
+  .marquee{text-align:center;margin-bottom:8px}
+  .marquee .lights{font-size:13px;letter-spacing:.6em;color:var(--gold)}
+  h1{font-family:'Bebas Neue';font-size:clamp(40px,12vw,56px);text-align:center;letter-spacing:.06em;line-height:1}
+  h1 span{color:var(--gold)}
+  .sub{text-align:center;font-size:12px;color:var(--dim);margin-top:4px;margin-bottom:26px}
+
+  .stage{background:var(--stage);border:1px solid rgba(255,201,77,.18);border-radius:20px;
+    padding:24px 18px;box-shadow:0 24px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.05)}
+  .stage-label{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim);text-align:center;margin-bottom:18px}
+
+  .row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .row .ord{font-family:'Bebas Neue';font-size:18px;color:var(--gold);width:26px}
+  .digits{display:flex;gap:6px;flex:1;justify-content:center}
+  .digit{
+    width:42px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    font-family:'Bebas Neue';font-size:34px;
+    background:linear-gradient(180deg,#241a33,#191024);
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:inset 0 -8px 14px rgba(0,0,0,.45);
+    color:transparent;position:relative;overflow:hidden;
+  }
+  .digit::after{content:'?';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    color:#473760;font-size:26px;transition:opacity .2s}
+  .digit.on{color:var(--ink)}
+  .digit.on::after{opacity:0}
+  .digit.hl{border-color:var(--gold);color:var(--gold);box-shadow:0 0 18px rgba(255,201,77,.25),inset 0 -8px 14px rgba(0,0,0,.45)}
+  .row .mil{font-size:10px;color:var(--dim);width:46px;text-align:right;opacity:0;transition:opacity .4s}
+  .row.done .mil{opacity:1}
+
+  .reveal-btn{
+    width:100%;margin-top:18px;padding:18px;border:none;border-radius:14px;cursor:pointer;
+    font-family:'Bebas Neue';font-size:24px;letter-spacing:.18em;
+    background:linear-gradient(180deg,var(--gold),#e0a52e);color:#241a05;
+    box-shadow:0 10px 28px rgba(255,201,77,.3);transition:transform .15s;
+  }
+  .reveal-btn:active{transform:scale(.97)}
+  .reveal-btn[disabled]{opacity:.45;box-shadow:none}
+
+  .verdicts{margin-top:22px;display:flex;flex-direction:column;gap:14px}
+  .verdict{background:var(--stage);border-radius:16px;padding:18px;border:1px solid rgba(255,255,255,.07);
+    opacity:0;transform:translateY(16px)}
+  .v-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .v-title{font-family:'Bebas Neue';font-size:20px;letter-spacing:.06em}
+  .v-pill{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;border-radius:99px}
+  .v-pill.miss{background:rgba(255,77,109,.14);color:var(--red)}
+  .v-pill.close{background:rgba(61,220,151,.14);color:var(--green)}
+  .v-body{font-size:13px;color:var(--dim);line-height:1.55}
+  .v-body b{color:var(--ink)}
+  .v-meta{font-size:11px;color:#6d6390;margin-top:8px}
+
+  .next-bar{margin-top:22px;display:flex;justify-content:space-between;align-items:center;
+    background:rgba(255,201,77,.07);border:1px dashed rgba(255,201,77,.35);border-radius:14px;padding:14px 16px}
+  .next-bar .t{font-size:12px;color:var(--dim)}
+  .next-bar .d{font-family:'Bebas Neue';font-size:22px;color:var(--gold);letter-spacing:.08em}
+  footer{margin-top:26px;text-align:center;font-size:11px;color:#6d6390;line-height:1.6}
+  .confetti{position:fixed;width:10px;height:14px;top:-20px;z-index:50;pointer-events:none;border-radius:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="marquee"><span class="lights">✦ ✦ ✦ ✦ ✦</span></div>
+  <h1>A SORTE ESTÁ <span>LANÇADA</span></h1>
+  <div class="sub">Loteria Federal · Extração 16/05/2026 · Concurso 5876</div>
+
+  <div class="stage">
+    <div class="stage-label">Toque para revelar os prêmios</div>
+    <div id="rows"></div>
+    <button class="reveal-btn" id="btn">REVELAR</button>
+  </div>
+
+  <div class="verdicts">
+    <div class="verdict" id="v1">
+      <div class="v-head"><span class="v-title">🏠 IMÓVEL — COTA 3311</span><span class="v-pill miss">Não foi dessa vez</span></div>
+      <div class="v-body">Seus números <b>3311 · 6644 · 9977</b> não saíram. O mais perto foi o 3º prêmio: milhar <b>6640</b>, a <b>4</b> do seu <b>6644</b>.</div>
+      <div class="v-meta">Grupo 000760 · próxima extração 17/06</div>
+    </div>
+    <div class="verdict" id="v2">
+      <div class="v-head"><span class="v-title">🚗 VEÍCULO — COTA 974</span><span class="v-pill close">Por 1 número!</span></div>
+      <div class="v-body">O 5º prêmio tirou a centena <b>975</b> — exatamente <b>1 acima</b> da sua <b>974</b>. Quase!</div>
+      <div class="v-meta">Grupo 01633 · próxima extração 08/07</div>
+    </div>
+  </div>
+
+  <div class="next-bar">
+    <span class="t">Próxima extração (Imóvel)</span>
+    <span class="d">17 / 06</span>
+  </div>
+
+  <footer>Análise matemática baseada nos regulamentos.<br>Não substitui a confirmação oficial da Ademicon.</footer>
+</div>
+
+<script>
+const premios=['58694','03317','96640','11972','40975'];
+const rows=document.getElementById('rows');
+premios.forEach((p,i)=>{
+  const r=document.createElement('div');r.className='row';r.id='r'+i;
+  r.innerHTML=`<span class="ord">${i+1}º</span>
+    <div class="digits">${[...p].map((d,j)=>`<div class="digit${j>0?' is-mil':''}" data-d="${d}"></div>`).join('')}</div>
+    <span class="mil">milhar<br><b style="color:var(--ink)">${p.slice(1)}</b></span>`;
+  rows.appendChild(r);
+});
+
+const btn=document.getElementById('btn');
+let revealed=false;
+btn.addEventListener('click',()=>{
+  if(revealed)return;revealed=true;btn.disabled=true;btn.textContent='SORTEANDO…';
+  const tl=gsap.timeline({onComplete:finale});
+  premios.forEach((p,i)=>{
+    const digits=document.querySelectorAll('#r'+i+' .digit');
+    digits.forEach((el,j)=>{
+      tl.call(()=>spin(el),null,'+='+(j===0?0.5:0.28));
+    });
+    tl.call(()=>document.getElementById('r'+i).classList.add('done'),null,'+=.3');
+  });
+});
+function spin(el){
+  const target=el.dataset.d;let n=0;
+  el.classList.add('on');
+  const iv=setInterval(()=>{
+    el.textContent=Math.floor(Math.random()*10);
+    if(++n>7){clearInterval(iv);el.textContent=target;
+      if(el.classList.contains('is-mil'))el.classList.add('hl');
+      gsap.fromTo(el,{scale:1.25},{scale:1,duration:.3,ease:'back.out(2)'});
+    }
+  },45);
+}
+function finale(){
+  btn.textContent='EXTRAÇÃO COMPLETA';
+  gsap.to('#v1',{opacity:1,y:0,duration:.7,delay:.2,ease:'power3.out'});
+  gsap.to('#v2',{opacity:1,y:0,duration:.7,delay:.45,ease:'power3.out'});
+  const colors=['#ffc94d','#ff4d6d','#3ddc97','#7b5cff','#f5f1ff'];
+  for(let i=0;i<90;i++){
+    const c=document.createElement('div');c.className='confetti';
+    c.style.left=Math.random()*100+'vw';
+    c.style.background=colors[i%colors.length];
+    document.body.appendChild(c);
+    gsap.to(c,{y:innerHeight+60,rotation:Math.random()*720-360,x:'+='+(Math.random()*120-60),
+      duration:2+Math.random()*2,delay:Math.random()*.8,ease:'power1.in',
+      onComplete:()=>c.remove()});
+  }
+}
+gsap.from('.wrap > *',{y:22,opacity:0,duration:.8,stagger:.1,ease:'power3.out'});
+</script>
+</body>
+</html>

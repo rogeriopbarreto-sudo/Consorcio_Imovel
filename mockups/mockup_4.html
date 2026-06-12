@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mockup 4 — Globo da Sorte · Consórcios Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  :root{
+    --wood:#2b1608;--wood-2:#3d2210;--cream:#f7ecd9;--ink:#2a1505;
+    --gold:#d4a437;--gold-2:#f3cf6e;--red:#a31621;--green:#1e6e4e;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    font-family:'Lora',serif;color:var(--cream);min-height:100dvh;overflow-x:hidden;
+    background:
+      radial-gradient(ellipse 100% 50% at 50% 0%,#4a2a12 0%,transparent 60%),
+      repeating-linear-gradient(90deg,var(--wood) 0 70px,var(--wood-2) 70px 140px);
+  }
+  .wrap{max-width:480px;margin:0 auto;padding:26px 18px 60px;position:relative;z-index:2}
+
+  .bunting{display:flex;justify-content:center;gap:4px;margin-bottom:14px}
+  .flag{width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-top:16px solid var(--gold)}
+  .flag:nth-child(2n){border-top-color:var(--red)}
+  .flag:nth-child(3n){border-top-color:var(--green)}
+
+  h1{font-family:'Alfa Slab One';font-size:clamp(26px,8vw,36px);text-align:center;line-height:1.1;
+    color:var(--gold-2);text-shadow:0 3px 0 #7a5a10,0 6px 14px rgba(0,0,0,.5)}
+  .sub{text-align:center;font-style:italic;font-size:14px;color:#cdb491;margin:8px 0 18px}
+
+  #globo-wrap{position:relative;height:280px;margin-bottom:6px}
+  #globo{position:absolute;inset:0}
+  .globo-base{margin:-26px auto 18px;width:200px;height:22px;border-radius:50%;
+    background:radial-gradient(ellipse at 50% 30%,#6b4a1e,#241105 75%);
+    box-shadow:0 8px 18px rgba(0,0,0,.55);position:relative;z-index:1}
+
+  .placa{
+    background:linear-gradient(180deg,#fdf6e8,var(--cream));color:var(--ink);
+    border-radius:14px;border:3px solid var(--gold);padding:18px;margin-bottom:16px;
+    box-shadow:0 10px 26px rgba(0,0,0,.45), inset 0 0 0 6px rgba(212,164,55,.14);
+  }
+  .placa-title{font-family:'Alfa Slab One';font-size:13px;letter-spacing:.06em;color:var(--red);
+    text-align:center;margin-bottom:12px;text-transform:uppercase}
+  .premio-line{display:flex;align-items:center;justify-content:space-between;padding:7px 4px;border-bottom:1px dashed #d9c9a8}
+  .premio-line:last-child{border-bottom:none}
+  .premio-line .ord{font-family:'Alfa Slab One';font-size:13px;color:#8a6914;width:28px}
+  .bilhete{font-family:'Alfa Slab One';font-size:21px;letter-spacing:.16em;color:var(--ink)}
+  .bilhete b{color:var(--red)}
+  .premio-line .m{font-size:11px;color:#9b865e}
+
+  .cartela{background:linear-gradient(180deg,#fdf6e8,var(--cream));color:var(--ink);border-radius:14px;
+    border:3px solid var(--gold);padding:18px;margin-bottom:16px;
+    box-shadow:0 10px 26px rgba(0,0,0,.45)}
+  .c-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+  .c-title{font-family:'Alfa Slab One';font-size:16px}
+  .stamp{font-family:'Alfa Slab One';font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:6px 10px;border:2px solid;border-radius:6px;transform:rotate(-3deg)}
+  .stamp.miss{color:var(--red);border-color:var(--red)}
+  .stamp.close{color:var(--green);border-color:var(--green)}
+  .c-sub{font-size:12px;color:#7d6843;margin-bottom:12px}
+  .bolas{display:flex;gap:10px;margin-bottom:12px}
+  .bola{
+    width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-family:'Alfa Slab One';font-size:15px;color:var(--ink);
+    background:radial-gradient(circle at 32% 28%,#fff 0 18%,#f3e3bd 40%,#d9bd7e 100%);
+    border:2px solid #b98f2e;box-shadow:0 4px 10px rgba(0,0,0,.25), inset 0 -4px 8px rgba(140,100,20,.3);
+  }
+  .c-result{font-size:14px;line-height:1.55}
+  .c-result b{color:var(--red)}
+
+  .botoes{display:flex;gap:12px;margin-top:4px}
+  button{
+    flex:1;font-family:'Alfa Slab One';font-size:13px;letter-spacing:.05em;padding:15px;cursor:pointer;
+    border-radius:12px;border:3px solid var(--gold);text-transform:uppercase;transition:transform .12s;
+  }
+  button:active{transform:scale(.96)}
+  .b-red{background:linear-gradient(180deg,#c52232,var(--red));color:var(--cream);box-shadow:0 6px 0 #5e0c13}
+  .b-cream{background:linear-gradient(180deg,#fdf6e8,var(--cream));color:var(--ink);box-shadow:0 6px 0 #8a6914}
+  .proxima{text-align:center;margin-top:20px;font-size:13px;color:#cdb491}
+  .proxima b{font-family:'Alfa Slab One';color:var(--gold-2);font-size:17px;letter-spacing:.04em}
+  footer{margin-top:22px;text-align:center;font-size:11px;color:#9b7f57;line-height:1.6;font-style:italic}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bunting">
+    <div class="flag"></div><div class="flag"></div><div class="flag"></div><div class="flag"></div><div class="flag"></div><div class="flag"></div><div class="flag"></div><div class="flag"></div><div class="flag"></div><div class="flag"></div><div class="flag"></div><div class="flag"></div>
+  </div>
+  <h1>GLOBO DA SORTE</h1>
+  <div class="sub">Loteria Federal · Extração de 16 de maio de 2026</div>
+
+  <div id="globo-wrap"><div id="globo"></div></div>
+  <div class="globo-base"></div>
+
+  <div class="placa" data-anim>
+    <div class="placa-title">★ Bilhetes Premiados ★</div>
+    <div class="premio-line"><span class="ord">1º</span><span class="bilhete">5<b>8694</b></span><span class="m">milhar 8694</span></div>
+    <div class="premio-line"><span class="ord">2º</span><span class="bilhete">0<b>3317</b></span><span class="m">milhar 3317</span></div>
+    <div class="premio-line"><span class="ord">3º</span><span class="bilhete">9<b>6640</b></span><span class="m">milhar 6640</span></div>
+    <div class="premio-line"><span class="ord">4º</span><span class="bilhete">1<b>1972</b></span><span class="m">milhar 1972</span></div>
+    <div class="premio-line"><span class="ord">5º</span><span class="bilhete">4<b>0975</b></span><span class="m">milhar 0975</span></div>
+  </div>
+
+  <div class="cartela" data-anim>
+    <div class="c-head"><span class="c-title">🏠 Consórcio Imóvel</span><span class="stamp miss">Não foi dessa vez</span></div>
+    <div class="c-sub">Grupo 000760 · Cota 3311 · próxima extração 17/06</div>
+    <div class="bolas"><div class="bola">3311</div><div class="bola">6644</div><div class="bola">9977</div></div>
+    <div class="c-result">O mais perto foi o 3º prêmio: milhar <b>6640</b>, a apenas <b>4 números</b> do seu equivalente <b>6644</b>.</div>
+  </div>
+
+  <div class="cartela" data-anim>
+    <div class="c-head"><span class="c-title">🚗 Consórcio Veículo</span><span class="stamp close">Por um fio!</span></div>
+    <div class="c-sub">Grupo 01633 · Cota 974 · próxima extração 08/07</div>
+    <div class="bolas"><div class="bola">974</div></div>
+    <div class="c-result">O 5º prêmio tirou a centena <b>975</b> — <b>1 número acima</b> da sua cota. Quase lá!</div>
+  </div>
+
+  <div class="botoes" data-anim>
+    <button class="b-red">Atualizar agora</button>
+    <button class="b-cream">Calendário</button>
+  </div>
+
+  <div class="proxima">Próxima extração · <b>17 DE JUNHO — IMÓVEL</b></div>
+  <footer>Análise matemática conforme regulamentos dos grupos.<br>Não substitui a confirmação oficial da Ademicon.</footer>
+</div>
+
+<script>
+// ---- three.js: globo de loteria com bolas girando ----
+const wrapEl=document.getElementById('globo');
+const W=wrapEl.clientWidth,H=280;
+const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(W,H);
+wrapEl.appendChild(renderer.domElement);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(45,W/H,.1,100);
+camera.position.set(0,0,7.2);
+scene.add(new THREE.AmbientLight(0xffffff,.65));
+const key=new THREE.PointLight(0xffe2a0,1.1);key.position.set(4,5,6);scene.add(key);
+const rim=new THREE.PointLight(0xd4a437,.7);rim.position.set(-5,-2,4);scene.add(rim);
+
+const globe=new THREE.Group();scene.add(globe);
+// cage (esfera aramada dourada)
+const cage=new THREE.Mesh(
+  new THREE.SphereGeometry(2.5,18,14),
+  new THREE.MeshStandardMaterial({color:0xd4a437,metalness:.85,roughness:.3,wireframe:true,transparent:true,opacity:.85})
+);
+globe.add(cage);
+// vidro sutil
+globe.add(new THREE.Mesh(
+  new THREE.SphereGeometry(2.46,32,24),
+  new THREE.MeshPhysicalMaterial({color:0xfff6e0,transparent:true,opacity:.06,roughness:.1})
+));
+// bolas numeradas
+const balls=[];
+const ballMat=[0xf7ecd9,0xf3cf6e,0xe8d5ae].map(c=>new THREE.MeshStandardMaterial({color:c,roughness:.35,metalness:.05}));
+for(let i=0;i<26;i++){
+  const b=new THREE.Mesh(new THREE.SphereGeometry(.27,18,14),ballMat[i%3]);
+  b.userData={a:Math.random()*Math.PI*2,b:Math.random()*Math.PI*2,r:.4+Math.random()*1.5,s:.5+Math.random()};
+  globe.add(b);balls.push(b);
+}
+// eixo
+const axis=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,6.2),
+  new THREE.MeshStandardMaterial({color:0x8a6914,metalness:.9,roughness:.25}));
+axis.rotation.z=Math.PI/2;globe.add(axis);
+
+let t=0;
+(function loop(){
+  t+=.012;
+  globe.rotation.x=t*.9;
+  balls.forEach(b=>{
+    const u=b.userData;
+    b.position.set(
+      Math.cos(t*u.s+u.a)*u.r,
+      Math.sin(t*u.s*1.3+u.b)*u.r*.9,
+      Math.sin(t*u.s+u.a)*Math.cos(u.b)*u.r
+    );
+  });
+  renderer.render(scene,camera);
+  requestAnimationFrame(loop);
+})();
+addEventListener('resize',()=>{
+  const w=wrapEl.clientWidth;renderer.setSize(w,H);camera.aspect=w/H;camera.updateProjectionMatrix();
+});
+
+gsap.from('.wrap > *:not(#globo-wrap)',{y:24,opacity:0,duration:.8,stagger:.09,ease:'power3.out'});
+gsap.from('#globo-wrap',{scale:.6,opacity:0,duration:1.1,ease:'back.out(1.4)'});
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+.env
+*.pdf
+*.jpg
+*.jpeg
+credentials*.json
+service_account*.json
+docs_local/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/

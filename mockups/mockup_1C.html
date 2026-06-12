@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mockup 1C — Aurora Branco · Dígito a Dígito</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  :root{
+    --bg:#ffffff;
+    --ink:#171930;
+    --dim:#7d81a0;
+    --a1:#0bbf93;--a2:#6c4cf0;--a3:#f0468c;
+    --ok:#0bbf93;--bad:#f0468c;
+    --line:rgba(23,25,48,.09);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;min-height:100dvh}
+  .blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.16;z-index:0;pointer-events:none}
+  .b1{width:420px;height:420px;background:var(--a2);top:-140px;left:-120px}
+  .b2{width:380px;height:380px;background:var(--a1);top:30%;right:-160px}
+  .b3{width:360px;height:360px;background:var(--a3);bottom:-120px;left:-80px}
+  #bg{position:fixed;inset:0;z-index:1;opacity:.5}
+  .wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:26px 20px 60px}
+
+  header{margin-bottom:24px}
+  .top-line{display:flex;justify-content:space-between;align-items:center}
+  .kicker{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--a2);font-weight:600}
+  .date{font-size:11px;color:var(--dim)}
+  h1{font-family:'Unbounded';font-size:clamp(22px,7vw,30px);font-weight:800;line-height:1.12;margin-top:10px}
+  h1 em{font-style:normal;background:linear-gradient(90deg,var(--a1),var(--a2),var(--a3));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* ---- HERO: comparação dígito a dígito ---- */
+  .hero{background:#fff;border:1px solid var(--line);border-radius:24px;padding:22px 18px;margin-bottom:16px;
+    box-shadow:0 22px 54px rgba(108,76,240,.1)}
+  .hero-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+  .hero-title{font-family:'Unbounded';font-size:14px;font-weight:600}
+  .badge{font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;border-radius:99px;font-weight:700}
+  .badge.miss{background:rgba(240,70,140,.1);color:var(--a3)}
+  .badge.close{background:rgba(11,191,147,.13);color:#067a5d}
+
+  .digit-zone{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .dz-label{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);font-weight:600;align-self:flex-start}
+  .digits{display:flex;gap:7px}
+  .dgt{width:54px;height:64px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    font-family:'Unbounded';font-size:30px;font-weight:800}
+  .digits.mine .dgt{background:rgba(108,76,240,.08);color:var(--a2);border:1.5px solid rgba(108,76,240,.22)}
+  .digits.draw .dgt.ok{background:rgba(11,191,147,.1);color:#067a5d;border:1.5px solid rgba(11,191,147,.35)}
+  .digits.draw .dgt.bad{background:rgba(240,70,140,.08);color:var(--a3);border:1.5px solid rgba(240,70,140,.3)}
+  .links{display:flex;gap:7px;height:22px;align-items:center}
+  .links .ln{width:54px;display:flex;justify-content:center;font-size:13px}
+  .ln.ok{color:var(--ok)}
+  .ln.bad{color:var(--bad)}
+  .dz-meta{display:flex;justify-content:space-between;width:100%;margin-top:10px;font-size:11px;color:var(--dim)}
+  .dz-meta b{color:var(--ink)}
+  .veh .dgt{width:64px}
+  .veh .links .ln{width:64px}
+
+  /* resultado compacto */
+  .card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:16px;
+    box-shadow:0 14px 36px rgba(23,25,48,.05)}
+  .card-label{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);margin-bottom:13px;font-weight:600}
+  .premio-strip{display:flex;justify-content:space-between;gap:6px}
+  .pcol{flex:1;text-align:center;padding:9px 2px;border-radius:12px;background:#f7f7fb}
+  .pcol.hl{background:linear-gradient(180deg,rgba(11,191,147,.1),rgba(11,191,147,.04));box-shadow:inset 0 0 0 1.5px rgba(11,191,147,.3)}
+  .pcol .o{font-size:9px;color:var(--dim);letter-spacing:.1em}
+  .pcol .v{font-family:'Unbounded';font-size:13px;font-weight:700;margin-top:4px}
+  .fonte{margin-top:11px;font-size:11px;color:var(--dim);text-align:center}
+
+  .next{display:flex;justify-content:space-between;align-items:center;border-radius:18px;padding:16px 20px;margin-bottom:16px;
+    background:linear-gradient(90deg,rgba(11,191,147,.08),rgba(108,76,240,.08));border:1px solid var(--line)}
+  .next .t{font-size:12px;color:var(--dim)}
+  .next .d{font-family:'Unbounded';font-size:17px;font-weight:800}
+
+  .actions{display:flex;gap:12px}
+  button{flex:1;font-family:'Outfit';font-size:14px;font-weight:600;padding:16px;border-radius:16px;border:none;cursor:pointer;transition:transform .15s}
+  button:active{transform:scale(.97)}
+  .btn-main{background:linear-gradient(90deg,var(--a1),var(--a2));color:#fff;box-shadow:0 10px 24px rgba(108,76,240,.22)}
+  .btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+  footer{margin-top:26px;text-align:center;font-size:11px;color:var(--dim);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+<canvas id="bg"></canvas>
+<div class="wrap">
+  <header>
+    <div class="top-line">
+      <span class="kicker">Consórcios Control</span>
+      <span class="date">extração 16/05/2026</span>
+    </div>
+    <h1>Quão perto<br>você <em>chegou?</em></h1>
+  </header>
+
+  <!-- HERO IMÓVEL: dígito a dígito -->
+  <div class="hero" data-anim>
+    <div class="hero-head">
+      <span class="hero-title">🏠 Imóvel · G.000760 · cota 3311</span>
+      <span class="badge miss">Dist. 4</span>
+    </div>
+    <div class="digit-zone">
+      <span class="dz-label">Sua cota (equivalente 6644)</span>
+      <div class="digits mine"><span class="dgt">6</span><span class="dgt">6</span><span class="dgt">4</span><span class="dgt">4</span></div>
+      <div class="links">
+        <span class="ln ok">✓</span><span class="ln ok">✓</span><span class="ln ok">✓</span><span class="ln bad">✕</span>
+      </div>
+      <div class="digits draw"><span class="dgt ok">6</span><span class="dgt ok">6</span><span class="dgt ok">4</span><span class="dgt bad">0</span></div>
+      <span class="dz-label" style="align-self:flex-end">Sorteado · 3º prêmio</span>
+      <div class="dz-meta">
+        <span>3 dos 4 dígitos bateram</span>
+        <span>faltaram <b>4 números</b></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO VEÍCULO -->
+  <div class="hero veh" data-anim>
+    <div class="hero-head">
+      <span class="hero-title">🚗 Veículo · G.01633 · cota 974</span>
+      <span class="badge close">Dist. 1</span>
+    </div>
+    <div class="digit-zone">
+      <span class="dz-label">Sua cota</span>
+      <div class="digits mine"><span class="dgt">9</span><span class="dgt">7</span><span class="dgt">4</span></div>
+      <div class="links">
+        <span class="ln ok">✓</span><span class="ln ok">✓</span><span class="ln bad">✕</span>
+      </div>
+      <div class="digits draw"><span class="dgt ok">9</span><span class="dgt ok">7</span><span class="dgt bad">5</span></div>
+      <span class="dz-label" style="align-self:flex-end">Sorteado · 5º prêmio</span>
+      <div class="dz-meta">
+        <span>2 dos 3 dígitos bateram</span>
+        <span>faltou <b>1 número</b></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- resultado completo, compacto -->
+  <div class="card" data-anim>
+    <div class="card-label">Os 5 prêmios · concurso 5876</div>
+    <div class="premio-strip">
+      <div class="pcol"><div class="o">1º</div><div class="v">8694</div></div>
+      <div class="pcol"><div class="o">2º</div><div class="v">3317</div></div>
+      <div class="pcol hl"><div class="o">3º</div><div class="v">6640</div></div>
+      <div class="pcol"><div class="o">4º</div><div class="v">1972</div></div>
+      <div class="pcol hl"><div class="o">5º</div><div class="v">0975</div></div>
+    </div>
+    <div class="fonte">milhares (imóvel) · centenas (veículo) · Fonte: API da Caixa</div>
+  </div>
+
+  <div class="next" data-anim>
+    <span class="t">Próxima extração</span>
+    <span class="d">17/06 · Imóvel</span>
+  </div>
+
+  <div class="actions" data-anim>
+    <button class="btn-main">Atualizar agora</button>
+    <button class="btn-ghost">Calendário</button>
+  </div>
+
+  <footer>Análise matemática baseada nos regulamentos.<br>Não substitui a confirmação oficial da Ademicon.</footer>
+</div>
+
+<script>
+// three.js: partículas finas sobre os blobs aurora
+const canvas=document.getElementById('bg');
+const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(60,1,.1,100);camera.position.z=8;
+const N=420,pos=new Float32Array(N*3),col=new Float32Array(N*3);
+const palette=[[0.04,0.75,0.58],[0.42,0.30,0.94],[0.94,0.27,0.55]];
+for(let i=0;i<N;i++){
+  pos[i*3]=(Math.random()-.5)*18;pos[i*3+1]=(Math.random()-.5)*24;pos[i*3+2]=(Math.random()-.5)*7;
+  const c=palette[i%3];col[i*3]=c[0];col[i*3+1]=c[1];col[i*3+2]=c[2];
+}
+const geo=new THREE.BufferGeometry();
+geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+geo.setAttribute('color',new THREE.BufferAttribute(col,3));
+const pts=new THREE.Points(geo,new THREE.PointsMaterial({size:.055,vertexColors:true,transparent:true,opacity:.45,depthWrite:false}));
+scene.add(pts);
+function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}
+addEventListener('resize',resize);resize();
+let t=0;
+(function loop(){t+=.003;pts.rotation.y=t*.4;renderer.render(scene,camera);requestAnimationFrame(loop)})();
+
+gsap.from('header > *',{y:18,opacity:0,duration:.7,stagger:.1,ease:'power3.out'});
+gsap.from('[data-anim]',{y:30,opacity:0,duration:.8,stagger:.13,delay:.2,ease:'power3.out'});
+gsap.from('.digits .dgt',{scale:.6,opacity:0,duration:.45,stagger:.05,delay:.55,ease:'back.out(2)'});
+gsap.from('.links .ln',{opacity:0,duration:.4,stagger:.08,delay:1.1});
+</script>
+</body>
+</html>

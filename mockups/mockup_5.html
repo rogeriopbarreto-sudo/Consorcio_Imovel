@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mockup 5 — Fintech Clean · Consórcios Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  :root{
+    --bg:#f6f5f1;--card:#ffffff;--ink:#141413;--dim:#84827b;--line:#e7e5de;
+    --accent:#0d6b4f;--accent-soft:#e3f0ea;--warn:#b3261e;--warn-soft:#f7e7e5;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Archivo',sans-serif;background:var(--bg);color:var(--ink);min-height:100dvh}
+  .mono{font-family:'Spline Sans Mono',monospace}
+  .wrap{max-width:480px;margin:0 auto;padding:28px 20px 60px}
+
+  header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+  .brand{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+  .brand span{color:var(--accent)}
+  .date{font-size:12px;color:var(--dim)}
+  h1{font-size:clamp(28px,8vw,36px);font-weight:700;letter-spacing:-.03em;line-height:1.05;margin:14px 0 6px}
+  .lede{font-size:14px;color:var(--dim);margin-bottom:26px;line-height:1.5}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:14px}
+  .c-label{font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-bottom:14px}
+
+  table{width:100%;border-collapse:collapse}
+  td{padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+  tr:last-child td{border-bottom:none}
+  td.ord{color:var(--dim);width:30px;font-size:12px}
+  td.num{font-family:'Spline Sans Mono',monospace;font-weight:500;font-size:17px;letter-spacing:.1em}
+  td.num b{font-weight:700;border-bottom:2px solid var(--accent)}
+  td.mil{text-align:right;color:var(--dim);font-size:12px}
+  .fonte{margin-top:12px;font-size:11px;color:var(--dim)}
+
+  .cons{display:flex;align-items:center;gap:18px}
+  .gauge{position:relative;width:108px;height:108px;flex-shrink:0}
+  .gauge svg{transform:rotate(-90deg)}
+  .gauge .val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .gauge .val .n{font-family:'Spline Sans Mono',monospace;font-size:26px;font-weight:700;line-height:1}
+  .gauge .val .u{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:3px}
+  .cons-info{flex:1;min-width:0}
+  .cons-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:3px}
+  .cons-name{font-size:16px;font-weight:600;letter-spacing:-.01em}
+  .pill{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:99px;white-space:nowrap}
+  .pill.miss{background:var(--warn-soft);color:var(--warn)}
+  .pill.close{background:var(--accent-soft);color:var(--accent)}
+  .cons-sub{font-size:12px;color:var(--dim);margin-bottom:10px}
+  .cons-detail{font-size:13px;line-height:1.5}
+  .cons-detail b{font-weight:600}
+  .nums{display:flex;gap:6px;margin-top:10px}
+  .num-chip{font-family:'Spline Sans Mono',monospace;font-size:12px;font-weight:500;
+    border:1px solid var(--line);border-radius:8px;padding:5px 9px;background:var(--bg)}
+
+  .next{display:flex;justify-content:space-between;align-items:center;
+    background:var(--ink);color:var(--bg);border-radius:16px;padding:18px 20px;margin-bottom:14px}
+  .next .t{font-size:12px;opacity:.65}
+  .next .d{font-family:'Spline Sans Mono',monospace;font-size:20px;font-weight:700}
+  .next .badge{font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+    border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:4px 10px}
+
+  .acts{display:flex;gap:10px}
+  button{flex:1;font-family:'Archivo';font-size:14px;font-weight:600;padding:15px;border-radius:12px;
+    cursor:pointer;transition:transform .12s, box-shadow .2s;border:1px solid var(--line)}
+  button:active{transform:scale(.98)}
+  .b-pri{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .b-pri:hover{box-shadow:0 6px 16px rgba(13,107,79,.28)}
+  .b-sec{background:var(--card);color:var(--ink)}
+  footer{margin-top:24px;text-align:center;font-size:11px;color:var(--dim);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">CONSÓRCIOS<span>·</span>CONTROL</div>
+    <div class="date">11 jun 2026</div>
+  </header>
+  <h1>Extração de<br>16 de maio</h1>
+  <p class="lede">Nenhuma cota contemplada desta vez — mas o veículo passou <b>a 1 número</b> da contemplação.</p>
+
+  <div class="card" data-anim>
+    <div class="c-label">Loteria Federal · Concurso 5876</div>
+    <table>
+      <tr><td class="ord">1º</td><td class="num">5<b>8694</b></td><td class="mil">milhar 8694</td></tr>
+      <tr><td class="ord">2º</td><td class="num">0<b>3317</b></td><td class="mil">milhar 3317</td></tr>
+      <tr><td class="ord">3º</td><td class="num">9<b>6640</b></td><td class="mil">milhar 6640</td></tr>
+      <tr><td class="ord">4º</td><td class="num">1<b>1972</b></td><td class="mil">milhar 1972</td></tr>
+      <tr><td class="ord">5º</td><td class="num">4<b>0975</b></td><td class="mil">milhar 0975</td></tr>
+    </table>
+    <div class="fonte">Fonte: API oficial da Caixa · apurado em 16/05/2026</div>
+  </div>
+
+  <div class="card" data-anim>
+    <div class="cons">
+      <div class="gauge">
+        <svg width="108" height="108" viewBox="0 0 108 108">
+          <circle cx="54" cy="54" r="46" fill="none" stroke="var(--line)" stroke-width="9"/>
+          <circle class="arc" cx="54" cy="54" r="46" fill="none" stroke="var(--warn)" stroke-width="9"
+            stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="289" data-target="34"/>
+        </svg>
+        <div class="val"><span class="n">4</span><span class="u">de dist.</span></div>
+      </div>
+      <div class="cons-info">
+        <div class="cons-top"><span class="cons-name">Imóvel</span><span class="pill miss">Não contemplado</span></div>
+        <div class="cons-sub">Grupo 000760 · Cota 3311</div>
+        <div class="cons-detail">3º prêmio tirou <b>6640</b> — a 4 do seu equivalente <b>6644</b>.</div>
+        <div class="nums"><span class="num-chip">3311</span><span class="num-chip">6644</span><span class="num-chip">9977</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-anim>
+    <div class="cons">
+      <div class="gauge">
+        <svg width="108" height="108" viewBox="0 0 108 108">
+          <circle cx="54" cy="54" r="46" fill="none" stroke="var(--line)" stroke-width="9"/>
+          <circle class="arc" cx="54" cy="54" r="46" fill="none" stroke="var(--accent)" stroke-width="9"
+            stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="289" data-target="282"/>
+        </svg>
+        <div class="val"><span class="n">1</span><span class="u">de dist.</span></div>
+      </div>
+      <div class="cons-info">
+        <div class="cons-top"><span class="cons-name">Veículo</span><span class="pill close">Por 1 número</span></div>
+        <div class="cons-sub">Grupo 01633 · Cota 974</div>
+        <div class="cons-detail">5º prêmio tirou centena <b>975</b> — exatamente 1 acima da sua <b>974</b>.</div>
+        <div class="nums"><span class="num-chip">974</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="next" data-anim>
+    <div>
+      <div class="t">Próxima extração</div>
+      <div class="d">17/06/2026</div>
+    </div>
+    <span class="badge">Imóvel</span>
+  </div>
+
+  <div class="acts" data-anim>
+    <button class="b-pri">Atualizar agora</button>
+    <button class="b-sec">Calendário</button>
+  </div>
+
+  <footer>Análise matemática baseada nos regulamentos dos grupos.<br>Não substitui a confirmação oficial da Ademicon.</footer>
+</div>
+
+<script>
+gsap.from('header, h1, .lede',{y:16,opacity:0,duration:.7,stagger:.08,ease:'power3.out'});
+gsap.from('[data-anim]',{y:24,opacity:0,duration:.7,stagger:.11,delay:.25,ease:'power3.out'});
+document.querySelectorAll('.arc').forEach((arc,i)=>{
+  gsap.to(arc,{strokeDashoffset:289-parseFloat(arc.dataset.target),duration:1.4,delay:.7+i*.25,ease:'power3.out'});
+});
+</script>
+</body>
+</html>

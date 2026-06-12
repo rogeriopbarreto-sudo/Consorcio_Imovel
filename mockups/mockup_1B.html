@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mockup 1B — Aurora Branco · Trilho de Comparação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  :root{
+    --bg:#fbfbf8;
+    --ink:#1a1c2e;
+    --dim:#80849f;
+    --a1:#0bbf93;--a2:#6c4cf0;--a3:#f0468c;
+    --card:#ffffff;
+    --line:rgba(26,28,46,.09);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;min-height:100dvh}
+  #bg{position:fixed;inset:0;z-index:0;opacity:.55}
+  .wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:26px 20px 60px}
+
+  header{text-align:center;margin-bottom:20px}
+  .kicker{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--a2);font-weight:600}
+  h1{font-family:'Unbounded';font-size:clamp(22px,7vw,28px);font-weight:800;margin-top:8px}
+  h1 em{font-style:normal;background:linear-gradient(90deg,var(--a1),var(--a2),var(--a3));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{font-size:12px;color:var(--dim);margin-top:6px}
+
+  /* ---- FAIXA DE COTAS (sticky no topo) ---- */
+  .minhas{position:sticky;top:10px;z-index:5;
+    background:linear-gradient(135deg,#fff,#f4f1ff);border:1px solid var(--line);border-radius:18px;
+    padding:14px 16px;margin-bottom:18px;box-shadow:0 14px 34px rgba(108,76,240,.13)}
+  .minhas .lab{font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:var(--dim);margin-bottom:9px;font-weight:600}
+  .minhas-row{display:flex;gap:8px;align-items:center}
+  .grupo-tag{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);width:52px;line-height:1.3}
+  .cota{font-family:'Unbounded';font-weight:800;font-size:17px;padding:7px 12px;border-radius:12px}
+  .cota.im{background:rgba(108,76,240,.1);color:var(--a2)}
+  .cota.ve{background:rgba(11,191,147,.12);color:#067a5d}
+  .minhas-row + .minhas-row{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:16px;
+    box-shadow:0 14px 36px rgba(26,28,46,.06)}
+  .card-label{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);margin-bottom:4px;font-weight:600}
+  .card-sub{font-size:12px;color:var(--dim);margin-bottom:16px}
+
+  /* ---- TRILHO: sorteado × sua cota, alinhados por linha ---- */
+  .rail-head{display:grid;grid-template-columns:24px 1fr 64px 1fr;gap:6px;font-size:9px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--dim);margin-bottom:10px;text-align:center;font-weight:600}
+  .rail-head :first-child{text-align:left}
+  .rrow{display:grid;grid-template-columns:24px 1fr 64px 1fr;gap:6px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+  .rrow .ord{font-family:'Unbounded';font-size:10px;color:var(--dim)}
+  .rrow .draw{font-family:'Unbounded';font-weight:800;font-size:20px;text-align:center;letter-spacing:.06em}
+  .rrow .mine{font-family:'Unbounded';font-weight:600;font-size:17px;text-align:center;color:var(--dim);letter-spacing:.06em}
+  .rrow .mine.win{color:var(--a2);font-weight:800}
+  .rrow .gap{text-align:center}
+  .rrow .gap span{display:inline-block;font-size:10px;font-weight:700;padding:4px 9px;border-radius:99px;min-width:44px}
+  .gap .far{background:#f3f3f6;color:var(--dim)}
+  .gap .near{background:rgba(240,70,140,.1);color:var(--a3)}
+  .gap .hot{background:rgba(11,191,147,.14);color:#067a5d;box-shadow:0 0 0 1.5px rgba(11,191,147,.35)}
+  .rrow.best{background:linear-gradient(90deg,rgba(11,191,147,.06),rgba(108,76,240,.05));border-radius:12px;
+    margin:0 -8px;padding-left:8px;padding-right:8px;border-top-color:transparent}
+  .verdict{display:flex;justify-content:space-between;align-items:center;margin-top:13px;padding-top:13px;border-top:1px dashed var(--line)}
+  .verdict .txt{font-size:12px;color:var(--dim);line-height:1.45}
+  .verdict .txt b{color:var(--ink)}
+  .badge{font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;border-radius:99px;font-weight:700;white-space:nowrap}
+  .badge.miss{background:rgba(240,70,140,.1);color:var(--a3)}
+  .badge.close{background:rgba(11,191,147,.13);color:#067a5d}
+
+  .actions{display:flex;gap:12px;margin-top:6px}
+  button{flex:1;font-family:'Outfit';font-size:14px;font-weight:600;padding:16px;border-radius:16px;border:none;cursor:pointer;transition:transform .15s}
+  button:active{transform:scale(.97)}
+  .btn-main{background:linear-gradient(90deg,var(--a1),var(--a2));color:#fff;box-shadow:0 10px 24px rgba(108,76,240,.22)}
+  .btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+  footer{margin-top:26px;text-align:center;font-size:11px;color:var(--dim);line-height:1.6}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="wrap">
+  <header>
+    <div class="kicker">Consórcios Control</div>
+    <h1>Sorteado <em>× sua cota</em></h1>
+    <div class="sub">Extração 16/05/2026 · concurso 5876 · próxima: 17/06 (Imóvel)</div>
+  </header>
+
+  <!-- COTAS SEMPRE VISÍVEIS NO TOPO -->
+  <div class="minhas" data-anim>
+    <div class="lab">Minhas cotas</div>
+    <div class="minhas-row">
+      <span class="grupo-tag">🏠 Imóvel G.000760</span>
+      <span class="cota im">3311</span><span class="cota im">6644</span><span class="cota im">9977</span>
+    </div>
+    <div class="minhas-row">
+      <span class="grupo-tag">🚗 Veículo G.01633</span>
+      <span class="cota ve">974</span>
+    </div>
+  </div>
+
+  <!-- IMÓVEL: trilho de comparação -->
+  <div class="card" data-anim>
+    <div class="card-label">🏠 Imóvel — milhar a milhar</div>
+    <div class="card-sub">Grupo 000760 · Cota 3311 (+ equivalentes 6644 / 9977)</div>
+    <div class="rail-head"><span></span><span>Sorteado</span><span>Distância</span><span>Sua + próx.</span></div>
+    <div class="rrow"><span class="ord">1º</span><span class="draw">8694</span><span class="gap"><span class="far">1283</span></span><span class="mine">9977</span></div>
+    <div class="rrow"><span class="ord">2º</span><span class="draw">3317</span><span class="gap"><span class="near">6</span></span><span class="mine">3311</span></div>
+    <div class="rrow best"><span class="ord">3º</span><span class="draw">6640</span><span class="gap"><span class="hot">4</span></span><span class="mine win">6644</span></div>
+    <div class="rrow"><span class="ord">4º</span><span class="draw">1972</span><span class="gap"><span class="far">1339</span></span><span class="mine">3311</span></div>
+    <div class="rrow"><span class="ord">5º</span><span class="draw">0975</span><span class="gap"><span class="far">2336</span></span><span class="mine">3311</span></div>
+    <div class="verdict">
+      <span class="txt">Melhor chegada: <b>6640 → 6644</b>, distância <b>4</b></span>
+      <span class="badge miss">Não contemplado</span>
+    </div>
+  </div>
+
+  <!-- VEÍCULO: trilho de comparação -->
+  <div class="card" data-anim>
+    <div class="card-label">🚗 Veículo — centena a centena</div>
+    <div class="card-sub">Grupo 01633 · Cota 974</div>
+    <div class="rail-head"><span></span><span>Sorteado</span><span>Distância</span><span>Sua cota</span></div>
+    <div class="rrow"><span class="ord">1º</span><span class="draw">694</span><span class="gap"><span class="far">280</span></span><span class="mine">974</span></div>
+    <div class="rrow"><span class="ord">2º</span><span class="draw">317</span><span class="gap"><span class="far">343</span></span><span class="mine">974</span></div>
+    <div class="rrow"><span class="ord">3º</span><span class="draw">640</span><span class="gap"><span class="far">334</span></span><span class="mine">974</span></div>
+    <div class="rrow"><span class="ord">4º</span><span class="draw">972</span><span class="gap"><span class="near">2</span></span><span class="mine">974</span></div>
+    <div class="rrow best"><span class="ord">5º</span><span class="draw">975</span><span class="gap"><span class="hot">1</span></span><span class="mine win">974</span></div>
+    <div class="verdict">
+      <span class="txt">Melhor chegada: <b>975 → 974</b>, distância <b>1</b> (acima)</span>
+      <span class="badge close">Por 1 número!</span>
+    </div>
+  </div>
+
+  <div class="actions" data-anim>
+    <button class="btn-main">Atualizar agora</button>
+    <button class="btn-ghost">Calendário</button>
+  </div>
+
+  <footer>Análise matemática baseada nos regulamentos.<br>Não substitui a confirmação oficial da Ademicon.</footer>
+</div>
+
+<script>
+// three.js: névoa aurora suave no fundo branco
+const canvas=document.getElementById('bg');
+const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(60,1,.1,100);camera.position.z=8;
+const N=550,pos=new Float32Array(N*3),col=new Float32Array(N*3);
+const palette=[[0.04,0.75,0.58],[0.42,0.30,0.94],[0.94,0.27,0.55]];
+for(let i=0;i<N;i++){
+  pos[i*3]=(Math.random()-.5)*18;pos[i*3+1]=(Math.random()-.5)*24;pos[i*3+2]=(Math.random()-.5)*7;
+  const c=palette[i%3];col[i*3]=c[0];col[i*3+1]=c[1];col[i*3+2]=c[2];
+}
+const geo=new THREE.BufferGeometry();
+geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+geo.setAttribute('color',new THREE.BufferAttribute(col,3));
+scene.add(new THREE.Points(geo,new THREE.PointsMaterial({size:.07,vertexColors:true,transparent:true,opacity:.4,depthWrite:false})));
+function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}
+addEventListener('resize',resize);resize();
+let t=0;const pts=scene.children[0];
+(function loop(){t+=.003;pts.rotation.y=t*.35;pts.rotation.z=Math.sin(t*.4)*.06;
+  renderer.render(scene,camera);requestAnimationFrame(loop)})();
+
+gsap.from('header > *',{y:18,opacity:0,duration:.7,stagger:.1,ease:'power3.out'});
+gsap.from('[data-anim]',{y:30,opacity:0,duration:.8,stagger:.13,delay:.2,ease:'power3.out'});
+gsap.from('.rrow',{x:-14,opacity:0,duration:.5,stagger:.06,delay:.6,ease:'power2.out'});
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+[
+  {"consorcio_id": "imovel", "vencimento": "2026-01-15", "extracao": "2026-01-17", "oferta_lance": "2026-01-19", "assembleia": "2026-01-20"},
+  {"consorcio_id": "imovel", "vencimento": "2026-02-18", "extracao": "2026-02-21", "oferta_lance": "2026-02-23", "assembleia": "2026-02-24"},
+  {"consorcio_id": "imovel", "vencimento": "2026-03-16", "extracao": "2026-03-18", "oferta_lance": "2026-03-19", "assembleia": "2026-03-20"},
+  {"consorcio_id": "imovel", "vencimento": "2026-04-15", "extracao": "2026-04-18", "oferta_lance": "2026-04-20", "assembleia": "2026-04-22"},
+  {"consorcio_id": "imovel", "vencimento": "2026-05-15", "extracao": "2026-05-16", "oferta_lance": "2026-05-19", "assembleia": "2026-05-20"},
+  {"consorcio_id": "imovel", "vencimento": "2026-06-15", "extracao": "2026-06-17", "oferta_lance": "2026-06-18", "assembleia": "2026-06-19"},
+  {"consorcio_id": "imovel", "vencimento": "2026-07-15", "extracao": "2026-07-18", "oferta_lance": "2026-07-20", "assembleia": "2026-07-21"},
+  {"consorcio_id": "imovel", "vencimento": "2026-08-17", "extracao": "2026-08-19", "oferta_lance": "2026-08-20", "assembleia": "2026-08-21"},
+  {"consorcio_id": "imovel", "vencimento": "2026-09-15", "extracao": "2026-09-16", "oferta_lance": "2026-09-17", "assembleia": "2026-09-18"},
+  {"consorcio_id": "imovel", "vencimento": "2026-10-15", "extracao": "2026-10-17", "oferta_lance": "2026-10-19", "assembleia": "2026-10-20"},
+  {"consorcio_id": "imovel", "vencimento": "2026-11-16", "extracao": "2026-11-18", "oferta_lance": "2026-11-19", "assembleia": "2026-11-23"},
+  {"consorcio_id": "imovel", "vencimento": "2026-12-15", "extracao": "2026-12-16", "oferta_lance": "2026-12-17", "assembleia": "2026-12-18"},
+
+  {"consorcio_id": "veiculo", "vencimento": "2026-04-07", "extracao": "2026-04-08", "oferta_lance": "2026-04-09", "assembleia": "2026-04-10", "chamadas": ["2026-04-13", "2026-04-17", "2026-04-24"]},
+  {"consorcio_id": "veiculo", "vencimento": "2026-05-07", "extracao": "2026-05-09", "oferta_lance": "2026-05-12", "assembleia": "2026-05-13", "chamadas": ["2026-05-14", "2026-05-20", "2026-05-26"]},
+  {"consorcio_id": "veiculo", "vencimento": "2026-06-08", "extracao": "2026-06-10", "oferta_lance": "2026-06-11", "assembleia": "2026-06-12", "chamadas": ["2026-06-15", "2026-06-19", "2026-06-25"]},
+  {"consorcio_id": "veiculo", "vencimento": "2026-07-07", "extracao": "2026-07-08", "oferta_lance": "2026-07-09", "assembleia": "2026-07-10", "chamadas": ["2026-07-13", "2026-07-17", "2026-07-23"]},
+  {"consorcio_id": "veiculo", "vencimento": "2026-08-07", "extracao": "2026-08-08", "oferta_lance": "2026-08-12", "assembleia": "2026-08-13", "chamadas": ["2026-08-14", "2026-08-20", "2026-08-26"]},
+  {"consorcio_id": "veiculo", "vencimento": "2026-09-09", "extracao": "2026-09-12", "oferta_lance": "2026-09-14", "assembleia": "2026-09-15", "chamadas": ["2026-09-16", "2026-09-22", "2026-09-28"]},
+  {"consorcio_id": "veiculo", "vencimento": "2026-10-07", "extracao": "2026-10-10", "oferta_lance": "2026-10-13", "assembleia": "2026-10-14", "chamadas": ["2026-10-15", "2026-10-21", "2026-10-27"]},
+  {"consorcio_id": "veiculo", "vencimento": "2026-11-09", "extracao": "2026-11-11", "oferta_lance": "2026-11-12", "assembleia": "2026-11-13", "chamadas": ["2026-11-16", "2026-11-23", "2026-11-27"]},
+  {"consorcio_id": "veiculo", "vencimento": "2026-12-07", "extracao": "2026-12-09", "oferta_lance": "2026-12-10", "assembleia": "2026-12-11", "chamadas": ["2026-12-14", "2026-12-18", "2026-12-23"]}
+]

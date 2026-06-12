@@ -1,0 +1,34 @@
+[
+  {
+    "id": "imovel",
+    "nome": "Imóvel",
+    "emoji": "🏠",
+    "administradora": "Ademicon",
+    "grupo": "000760",
+    "cota": 3311,
+    "unidade": "milhar",
+    "regra": {
+      "digitos": 4,
+      "modulo": 3333,
+      "base_um": true,
+      "equivalentes": [0, 3333, 6666],
+      "elimina_zero": true
+    }
+  },
+  {
+    "id": "veiculo",
+    "nome": "Veículo",
+    "emoji": "🚗",
+    "administradora": "Ademicon",
+    "grupo": "01633",
+    "cota": 974,
+    "unidade": "centena",
+    "regra": {
+      "digitos": 3,
+      "modulo": 1000,
+      "base_um": false,
+      "equivalentes": [0],
+      "elimina_zero": false
+    }
+  }
+]
