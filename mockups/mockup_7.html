@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup 7 · Terminal de Mercado — Consórcios Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0f0e; --panel:#111715; --panel-2:#161e1b; --edge:#23302b;
+    --txt:#d9e4df; --dim:#5f7068; --green:#3ddc91; --amber:#ffb454; --red:#ff6b5e;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Archivo',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;
+    background-image:linear-gradient(rgba(61,220,145,.025) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(61,220,145,.025) 1px,transparent 1px);
+    background-size:36px 36px}
+  .mono{font-family:'Spline Sans Mono',monospace;font-variant-numeric:tabular-nums}
+  .wrap{max-width:560px;margin:0 auto;padding:26px 18px 60px}
+
+  /* Top bar */
+  .bar{display:flex;align-items:center;justify-content:space-between;background:var(--panel);
+    border:1px solid var(--edge);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:11px}
+  .bar .logo{font-family:'Spline Sans Mono',monospace;font-weight:700;font-size:13px;letter-spacing:.1em;color:var(--green)}
+  .bar .logo span{color:var(--txt)}
+  .live{display:flex;align-items:center;gap:7px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase}
+  .live i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 1.6s infinite}
+  @keyframes blink{50%{opacity:.25}}
+
+  .panel{background:var(--panel);border:1px solid var(--edge);border-radius:12px;margin-bottom:14px;overflow:hidden}
+  .ph{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;
+    border-bottom:1px solid var(--edge);background:var(--panel-2)}
+  .ph .t{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);font-weight:600}
+  .ph .r{font-family:'Spline Sans Mono',monospace;font-size:10px;color:var(--dim)}
+  .pb{padding:16px}
+
+  /* Hero resultado */
+  .res-date{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+  .res-date .d{font-family:'Spline Sans Mono',monospace;font-size:22px;font-weight:700;color:var(--green)}
+  .res-date .c{font-size:11px;color:var(--dim)}
+  .draws{display:flex;flex-direction:column;gap:2px}
+  .draw{display:grid;grid-template-columns:30px 1fr auto;align-items:center;gap:12px;
+    padding:9px 10px;border-radius:7px}
+  .draw:nth-child(odd){background:rgba(255,255,255,.02)}
+  .draw.best{background:rgba(61,220,145,.07);outline:1px solid rgba(61,220,145,.25)}
+  .draw .o{font-family:'Spline Sans Mono',monospace;font-size:10px;color:var(--dim)}
+  .draw .n{font-family:'Spline Sans Mono',monospace;font-size:21px;font-weight:600;letter-spacing:.22em}
+  .draw .n .z{color:#3a4742}
+  .draw .frag{font-family:'Spline Sans Mono',monospace;font-size:10px;color:var(--dim);text-align:right;line-height:1.7}
+  .draw .frag b{color:var(--amber);font-weight:600}
+  .src{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:12px;
+    font-family:'Spline Sans Mono',monospace}
+  .src .ok{color:var(--green)}
+
+  /* Cotas ticker */
+  .ticket{display:grid;grid-template-columns:1fr auto;gap:4px 14px;padding:14px 16px;border-bottom:1px solid var(--edge)}
+  .ticket:last-child{border-bottom:none}
+  .ticket .nm{font-weight:600;font-size:14px}
+  .ticket .sub{font-size:11px;color:var(--dim);margin-top:2px}
+  .ticket .sub b{color:var(--txt);font-family:'Spline Sans Mono',monospace;font-weight:500}
+  .ticket .tag{align-self:center;text-align:right}
+  .pill{display:inline-block;font-family:'Spline Sans Mono',monospace;font-size:10px;font-weight:600;
+    letter-spacing:.08em;padding:4px 9px;border-radius:5px}
+  .pill.miss{color:var(--red);background:rgba(255,107,94,.1);border:1px solid rgba(255,107,94,.3)}
+  .pill.win{color:var(--green);background:rgba(61,220,145,.12);border:1px solid rgba(61,220,145,.4)}
+  .gapbar{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin-top:7px}
+  .gapbar .rail{flex:1;height:4px;background:var(--edge);border-radius:99px;position:relative;overflow:hidden}
+  .gapbar .fill{position:absolute;inset:0;border-radius:99px;transform-origin:left;
+    background:linear-gradient(90deg,var(--green),var(--amber),var(--red))}
+  .gapbar .v{font-family:'Spline Sans Mono',monospace;font-size:11px;color:var(--amber);min-width:86px;text-align:right}
+
+  /* Agenda */
+  .sched{display:flex;flex-direction:column}
+  .ev{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;
+    padding:13px 16px;border-bottom:1px solid var(--edge)}
+  .ev:last-child{border-bottom:none}
+  .ev .dt{font-family:'Spline Sans Mono',monospace;font-weight:700;font-size:15px;color:var(--txt)}
+  .ev .dt small{display:block;font-size:9px;font-weight:400;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-top:2px}
+  .ev .lbl{font-size:13px;font-weight:500}
+  .ev .lbl small{display:block;font-size:11px;color:var(--dim);font-weight:400;margin-top:2px}
+  .eta{font-family:'Spline Sans Mono',monospace;font-size:11px;color:var(--dim)}
+  .eta.hot{color:var(--green);font-weight:600}
+  .ev.next{background:linear-gradient(90deg,rgba(61,220,145,.06),transparent);border-left:3px solid var(--green)}
+
+  /* Ações */
+  .actions{display:flex;gap:10px;margin-top:4px}
+  button{flex:1;font-family:'Spline Sans Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.1em;
+    text-transform:uppercase;padding:14px;border-radius:9px;cursor:pointer;transition:all .15s;border:1px solid var(--edge)}
+  .b1{background:var(--green);color:#06211a;border-color:var(--green)}
+  .b1:hover{box-shadow:0 0 18px rgba(61,220,145,.4)}
+  .b2{background:transparent;color:var(--txt)}
+  .b2:hover{border-color:var(--green);color:var(--green)}
+  footer{margin-top:24px;text-align:center;font-size:10px;color:var(--dim);line-height:1.7;
+    font-family:'Spline Sans Mono',monospace}
+
+  .up{animation:up .6s ease both}
+  .up:nth-child(2){animation-delay:.07s}.up:nth-child(3){animation-delay:.14s}
+  .up:nth-child(4){animation-delay:.21s}.up:nth-child(5){animation-delay:.28s}.up:nth-child(6){animation-delay:.35s}
+  @keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar up">
+    <span class="logo">CONSÓRCIOS<span>//CTRL</span></span>
+    <span class="live"><i></i> monitor ativo</span>
+  </div>
+
+  <div class="panel up">
+    <div class="ph"><span class="t">Último sorteio · Loteria Federal</span><span class="r">CAIXA ✓</span></div>
+    <div class="pb">
+      <div class="res-date"><span class="d">10/06/2026</span><span class="c">concurso 6073 · qua 20:00</span></div>
+      <div class="draws mono">
+        <div class="draw"><span class="o">P1</span><span class="n"><span class="z">0</span>4807</span><span class="frag">mil <b>4807</b> · cen <b>807</b></span></div>
+        <div class="draw"><span class="o">P2</span><span class="n"><span class="z">0</span>2318</span><span class="frag">mil <b>2318</b> · cen <b>318</b></span></div>
+        <div class="draw"><span class="o">P3</span><span class="n">77702</span><span class="frag">mil <b>7702</b> · cen <b>702</b></span></div>
+        <div class="draw best"><span class="o">P4</span><span class="n"><span class="z">0</span>4099</span><span class="frag">mil <b>4099</b> · cen <b>099</b></span></div>
+        <div class="draw"><span class="o">P5</span><span class="n"><span class="z">0</span>9362</span><span class="frag">mil <b>9362</b> · cen <b>362</b></span></div>
+      </div>
+      <div class="src"><span>fonte: api oficial caixa</span><span class="ok">sync 12/06 14:32:07</span></div>
+    </div>
+  </div>
+
+  <div class="panel up">
+    <div class="ph"><span class="t">Suas cotas · análise do sorteio</span><span class="r">2 ativas</span></div>
+    <div class="ticket">
+      <div>
+        <div class="nm">🏠 Imóvel <span style="color:var(--dim);font-weight:400">· G.000760</span></div>
+        <div class="sub">cota <b>3311</b> · equivalentes <b>6644</b> <b>9977</b> · regra milhar</div>
+      </div>
+      <div class="tag"><span class="pill miss">NÃO CONTEMPLADA</span></div>
+      <div class="gapbar">
+        <div class="rail"><div class="fill" style="transform:scaleX(.47)"></div></div>
+        <span class="v">Δ 788 acima</span>
+      </div>
+    </div>
+    <div class="ticket">
+      <div>
+        <div class="nm">🚗 Veículo <span style="color:var(--dim);font-weight:400">· G.01633</span></div>
+        <div class="sub">cota <b>974</b> · regra centena</div>
+      </div>
+      <div class="tag"><span class="pill miss">NÃO CONTEMPLADA</span></div>
+      <div class="gapbar">
+        <div class="rail"><div class="fill" style="transform:scaleX(.25)"></div></div>
+        <span class="v">Δ 125 acima</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel up">
+    <div class="ph"><span class="t">Agenda de extrações</span><span class="r">2026</span></div>
+    <div class="sched">
+      <div class="ev next">
+        <div class="dt">17/06<small>quarta</small></div>
+        <div class="lbl">🏠 Imóvel — extração<small>assembleia 19/06</small></div>
+        <span class="eta hot">T-5 dias</span>
+      </div>
+      <div class="ev">
+        <div class="dt">08/07<small>quarta</small></div>
+        <div class="lbl">🚗 Veículo — extração<small>assembleia 10/07</small></div>
+        <span class="eta">T-26 dias</span>
+      </div>
+      <div class="ev">
+        <div class="dt">18/07<small>sábado</small></div>
+        <div class="lbl">🏠 Imóvel — extração<small>assembleia 21/07</small></div>
+        <span class="eta">T-36 dias</span>
+      </div>
+      <div class="ev">
+        <div class="dt">08/08<small>sábado</small></div>
+        <div class="lbl">🚗 Veículo — extração<small>assembleia 13/08</small></div>
+        <span class="eta">T-57 dias</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions up">
+    <button class="b1">▸ Atualizar agora</button>
+    <button class="b2">Inserir manual</button>
+  </div>
+
+  <footer class="up">análise matemática baseada nos regulamentos<br>não substitui a confirmação oficial da ademicon</footer>
+</div>
+</body>
+</html>

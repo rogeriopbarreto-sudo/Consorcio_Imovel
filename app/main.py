@@ -69,21 +69,52 @@ def calendario() -> JSONResponse:
     return JSONResponse({"eventos": eventos})
 
 
+DIAS_PT = ["segunda-feira", "terça-feira", "quarta-feira", "quinta-feira",
+           "sexta-feira", "sábado", "domingo"]
+
+
 @app.get("/")
 def dashboard(request: Request):
     consorcios = carregar_consorcios()
     res = service.ESTADO["resultado"]
     hoje = service.hoje_tz()
+
+    # A extração pertence ao consórcio com evento na data do resultado.
+    donos_ids = {e.consorcio_id for e in service.eventos_na_data(res.data)} if res else set()
+
     cards = []
     for cons in consorcios:
         analise = service.ESTADO["analises"].get(cons.id)
         prox = next((e.extracao for e in service.proximos_eventos(hoje, n=24)
                      if e.consorcio_id == cons.id), None)
-        cards.append({"cons": cons, "analise": analise, "proxima": prox})
+        participou = not donos_ids or cons.id in donos_ids
+        cards.append({"cons": cons, "analise": analise, "proxima": prox,
+                      "participou": participou})
+    cards.sort(key=lambda c: not c["participou"])
+
+    donos = [c["cons"] for c in cards if c["cons"].id in donos_ids]
+    ordem_destaque = None
+    if donos:
+        a = service.ESTADO["analises"].get(donos[0].id)
+        if a and a.melhor:
+            ordem_destaque = a.melhor.ordem
+
+    cons_por_id = {c.id: c for c in consorcios}
+    proximos_view = [{
+        "evento": e,
+        "cons": cons_por_id.get(e.consorcio_id),
+        "dias": (e.extracao - hoje).days,
+        "dia_semana": DIAS_PT[e.extracao.weekday()],
+        "mes_nome": service.MESES_PT[e.extracao.month],
+    } for e in service.proximos_eventos(hoje, n=5)]
+
     return templates.TemplateResponse(request, "dashboard.html", {
         "cards": cards,
         "resultado": res,
-        "proximos": service.proximos_eventos(hoje, n=4),
+        "res_dia_semana": DIAS_PT[res.data.weekday()] if res else None,
+        "donos": donos,
+        "ordem_destaque": ordem_destaque,
+        "proximos": proximos_view,
         "atualizado_em": service.ESTADO["atualizado_em"],
         "erro": service.ESTADO["erro"],
         "sheets_ok": sheets.configurado(),

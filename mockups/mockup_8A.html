@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup 8A · Institucional Suíço (revisado) — Consórcios Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#142847; --navy-2:#1d3660; --bg:#eef1f6; --card:#ffffff;
+    --ink:#16213a; --dim:#75809a; --line:#dde3ee;
+    --blue:#2f6bff; --green:#0e9e6e; --red:#d9482b; --amber:#e8a020;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+  .mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+  .wrap{max-width:560px;margin:0 auto;padding:0 18px 56px}
+
+  .band{background:var(--navy);color:#fff;margin:0 -18px;padding:30px 26px 64px;position:relative;overflow:hidden}
+  .band::after{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;
+    background:radial-gradient(circle,rgba(47,107,255,.35),transparent 70%)}
+  .band .k{font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:#8fa3c8;font-weight:600}
+  .band h1{font-family:'Bricolage Grotesque',sans-serif;font-size:27px;font-weight:800;margin-top:8px;letter-spacing:-.01em}
+  .band .sub{font-size:13px;color:#aebbd6;margin-top:6px}
+  .band .sub b{color:#fff;font-weight:600}
+
+  .stack{margin-top:-38px;position:relative;z-index:2}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:14px;
+    box-shadow:0 10px 28px rgba(20,40,71,.07);overflow:hidden}
+  .ch{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line)}
+  .ch .t{font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:700}
+  .ch .r{font-size:11px;color:var(--dim)}
+  .cb{padding:18px 20px}
+
+  /* Dono do sorteio */
+  .owner{display:inline-flex;align-items:center;gap:8px;background:#eef4ff;border:1px solid #c9daff;
+    color:var(--blue);font-weight:600;font-size:12px;padding:7px 13px;border-radius:99px;margin-bottom:14px}
+  .owner b{font-weight:700}
+
+  .res-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+  .res-top .d{font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700}
+  .res-top .c{font-size:11px;color:var(--dim)}
+
+  /* 1º prêmio hero */
+  .first{display:flex;align-items:center;gap:18px;background:#f8fafd;border:1px solid var(--line);
+    border-radius:12px;padding:16px 18px;margin-top:14px}
+  .first .lab{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);font-weight:600}
+  .first .n{font-family:'JetBrains Mono',monospace;font-size:38px;font-weight:700;letter-spacing:.06em;line-height:1.1}
+  .first .n span{color:#bcc6d8}
+  .first .deriv{margin-left:auto;text-align:right;font-size:11px;color:var(--dim);line-height:1.9}
+  .first .deriv b{font-family:'JetBrains Mono',monospace;color:var(--ink);font-size:13px}
+
+  /* demais prêmios compactos */
+  .rest{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .mini{flex:1;min-width:0;text-align:center;font-size:10px;color:var(--dim);padding:7px 4px;
+    border:1px dashed var(--line);border-radius:8px}
+  .mini .n{display:block;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;color:#5a6682;margin-top:2px;letter-spacing:.04em}
+  .mini.best{border-style:solid;border-color:#c9daff;background:#f4f8ff}
+  .mini.best .n{color:var(--blue);font-weight:700}
+  .res-src{display:flex;justify-content:space-between;margin-top:14px;font-size:11px;color:var(--dim)}
+  .res-src .ok{color:var(--green);font-weight:600}
+
+  /* Cotas */
+  .crow{display:flex;align-items:center;gap:14px;padding:15px 20px;border-bottom:1px solid var(--line)}
+  .crow:last-child{border-bottom:none}
+  .crow.off{opacity:.78}
+  .crow .ico{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+    font-size:19px;background:var(--bg)}
+  .crow .info{flex:1}
+  .crow .nm{font-weight:600;font-size:14px}
+  .crow .dt{font-size:11px;color:var(--dim);margin-top:2px}
+  .crow .dt b{font-family:'JetBrains Mono',monospace;color:var(--ink);font-weight:500}
+  .crow .gap{font-size:11px;color:var(--dim);margin-top:5px}
+  .crow .gap b{font-family:'JetBrains Mono',monospace;color:var(--ink)}
+  .chipst{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;letter-spacing:.06em;
+    text-transform:uppercase;padding:5px 10px;border-radius:99px;white-space:nowrap}
+  .chipst.miss{background:#fdeae5;color:var(--red)}
+  .chipst.win{background:#e2f6ee;color:var(--green)}
+  .chipst.idle{background:#edf0f5;color:var(--dim)}
+
+  /* Próxima extração hero */
+  .next-hero{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,var(--navy),var(--navy-2));
+    color:#fff;border-radius:12px;padding:16px 18px;margin-bottom:12px}
+  .next-hero .big{font-family:'Bricolage Grotesque',sans-serif;font-size:34px;font-weight:800;line-height:1}
+  .next-hero .big small{display:block;font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+    color:#8fa3c8;margin-top:4px}
+  .next-hero .what{flex:1;border-left:1px solid rgba(255,255,255,.18);padding-left:16px}
+  .next-hero .what .t{font-weight:600;font-size:14px}
+  .next-hero .what .s{font-size:11px;color:#aebbd6;margin-top:3px}
+  .next-hero .eta{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#7ef2c0;white-space:nowrap}
+  .evlist .ev{display:flex;align-items:center;gap:14px;padding:11px 20px;border-bottom:1px solid var(--line)}
+  .evlist .ev:last-child{border-bottom:none}
+  .evlist .dt{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;width:52px}
+  .evlist .lbl{flex:1;font-size:13px}
+  .evlist .lbl small{color:var(--dim)}
+  .evlist .eta{font-size:11px;color:var(--dim)}
+
+  .actions{display:flex;gap:10px;margin-top:2px}
+  button{flex:1;font-family:'Instrument Sans';font-size:14px;font-weight:600;padding:15px;border-radius:11px;
+    border:none;cursor:pointer;transition:transform .12s, box-shadow .12s}
+  button:active{transform:scale(.97)}
+  .b1{background:var(--blue);color:#fff;box-shadow:0 8px 20px rgba(47,107,255,.3)}
+  .b2{background:#fff;border:1px solid var(--line);color:var(--ink)}
+  footer{margin-top:26px;text-align:center;font-size:11px;color:var(--dim);line-height:1.6}
+
+  .rise{animation:rise .6s cubic-bezier(.2,.7,.3,1) both}
+  .rise:nth-child(2){animation-delay:.08s}.rise:nth-child(3){animation-delay:.16s}
+  .rise:nth-child(4){animation-delay:.24s}.rise:nth-child(5){animation-delay:.32s}
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="band">
+    <div class="k">Consórcios Control · Ademicon</div>
+    <h1>Central de Sorteios</h1>
+    <div class="sub">Última verificação: <b>12/06/2026 às 14:32</b> · tudo em dia</div>
+  </div>
+
+  <div class="stack">
+    <div class="card rise">
+      <div class="ch"><span class="t">Último sorteio</span><span class="r">Loteria Federal</span></div>
+      <div class="cb">
+        <div class="owner">🚗 Este sorteio vale para o&nbsp;<b>Consórcio Veículo · Cota 974</b></div>
+        <div class="res-top">
+          <span class="d">10/06/2026</span>
+          <span class="c">concurso 6.073 · quarta-feira</span>
+        </div>
+        <div class="first">
+          <div>
+            <div class="lab">1º Prêmio</div>
+            <div class="n"><span>0</span>4807</div>
+          </div>
+          <div class="deriv">milhar <b>4807</b><br>centena <b>807</b></div>
+        </div>
+        <div class="rest">
+          <div class="mini">2º<span class="n">02318</span></div>
+          <div class="mini">3º<span class="n">77702</span></div>
+          <div class="mini best">4º<span class="n">04099</span></div>
+          <div class="mini">5º<span class="n">09362</span></div>
+        </div>
+        <div class="res-src"><span>Fonte: API oficial da Caixa</span><span class="ok">✓ verificado</span></div>
+      </div>
+    </div>
+
+    <div class="card rise">
+      <div class="ch"><span class="t">Suas cotas</span><span class="r">situação atual</span></div>
+      <div class="crow">
+        <div class="ico">🚗</div>
+        <div class="info">
+          <div class="nm">Veículo · Cota <span class="mono" style="font-weight:700">974</span></div>
+          <div class="dt">grupo 01633 · regra de centena</div>
+          <div class="gap">sorteio de 10/06: mais próximo foi o 4º prêmio (cen <b>099</b>) · distância <b>125</b></div>
+        </div>
+        <div class="st"><span class="chipst miss">não contemplada</span></div>
+      </div>
+      <div class="crow off">
+        <div class="ico">🏠</div>
+        <div class="info">
+          <div class="nm">Imóvel · Cota <span class="mono" style="font-weight:700">3311</span></div>
+          <div class="dt">grupo 000760 · equivalentes <b>6644</b>/<b>9977</b> · regra de milhar</div>
+          <div class="gap">não participou do sorteio de 10/06 · concorre em <b>17/06</b></div>
+        </div>
+        <div class="st"><span class="chipst idle">aguarda 17/06</span></div>
+      </div>
+    </div>
+
+    <div class="next-hero rise">
+      <div class="big">17<small>junho</small></div>
+      <div class="what">
+        <div class="t">🏠 Imóvel — próxima extração</div>
+        <div class="s">quarta-feira · assembleia em 19/06</div>
+      </div>
+      <span class="eta">EM 5 DIAS</span>
+    </div>
+
+    <div class="card rise evlist">
+      <div class="ch"><span class="t">Datas seguintes</span><span class="r">calendário 2026</span></div>
+      <div class="ev"><span class="dt">08/07</span><span class="lbl">🚗 Veículo <small>· assembleia 10/07</small></span><span class="eta">26 dias</span></div>
+      <div class="ev"><span class="dt">18/07</span><span class="lbl">🏠 Imóvel <small>· assembleia 21/07</small></span><span class="eta">36 dias</span></div>
+      <div class="ev"><span class="dt">08/08</span><span class="lbl">🚗 Veículo <small>· assembleia 13/08</small></span><span class="eta">57 dias</span></div>
+      <div class="ev"><span class="dt">19/08</span><span class="lbl">🏠 Imóvel <small>· assembleia 21/08</small></span><span class="eta">68 dias</span></div>
+    </div>
+
+    <div class="actions rise">
+      <button class="b1">Atualizar agora</button>
+      <button class="b2">Inserir manual</button>
+    </div>
+
+    <footer class="rise">Análise matemática baseada nos regulamentos.<br>Não substitui a confirmação oficial da Ademicon.</footer>
+  </div>
+</div>
+</body>
+</html>

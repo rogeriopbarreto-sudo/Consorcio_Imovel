@@ -5,246 +5,268 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Consórcios Control</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#fafbff; --ink:#15172b; --dim:#7a7f9e;
-    --aurora-1:#0bbf93; --aurora-2:#6c4cf0; --aurora-3:#f0468c;
-    --card:rgba(255,255,255,.72); --card-border:rgba(21,23,43,.08);
+    --navy:#142847; --navy-2:#1d3660; --bg:#eef1f6; --card:#ffffff;
+    --ink:#16213a; --dim:#75809a; --line:#dde3ee;
+    --blue:#2f6bff; --green:#0e9e6e; --red:#d9482b; --amber:#e8a020;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;min-height:100dvh}
-  #bg{position:fixed;inset:0;z-index:0}
-  .veil{position:fixed;inset:0;z-index:1;pointer-events:none;
-    background:radial-gradient(ellipse 120% 70% at 50% 0%,transparent 20%,rgba(250,251,255,.92) 85%)}
-  .wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:26px 20px 60px}
+  body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100dvh}
+  .mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+  .wrap{max-width:560px;margin:0 auto;padding:0 18px 56px}
 
-  header{margin-bottom:22px}
-  .kicker{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--aurora-2);font-weight:600}
-  h1{font-family:'Unbounded';font-size:clamp(22px,7vw,30px);font-weight:800;line-height:1.1;margin-top:8px}
-  h1 em{font-style:normal;background:linear-gradient(90deg,var(--aurora-1),var(--aurora-2),var(--aurora-3));
-    -webkit-background-clip:text;background-clip:text;color:transparent}
-  .next{display:flex;align-items:center;gap:9px;margin-top:12px;font-size:13px;color:var(--dim)}
-  .pulse{width:8px;height:8px;border-radius:50%;background:var(--aurora-1);box-shadow:0 0 10px var(--aurora-1);animation:pulse 2s infinite}
-  @keyframes pulse{50%{opacity:.3}}
+  .band{background:var(--navy);color:#fff;margin:0 -18px;padding:30px 26px 64px;position:relative;overflow:hidden}
+  .band::after{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;
+    background:radial-gradient(circle,rgba(47,107,255,.35),transparent 70%)}
+  .band .k{font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:#8fa3c8;font-weight:600}
+  .band h1{font-family:'Bricolage Grotesque',sans-serif;font-size:27px;font-weight:800;margin-top:8px;letter-spacing:-.01em}
+  .band .sub{font-size:13px;color:#aebbd6;margin-top:6px}
+  .band .sub b{color:#fff;font-weight:600}
 
-  .alert{background:rgba(240,70,140,.08);border:1px solid rgba(240,70,140,.3);color:#b3256b;
-    border-radius:14px;padding:12px 16px;font-size:13px;margin-bottom:16px}
+  .stack{margin-top:-38px;position:relative;z-index:2}
+  .alert{background:#fdeae5;border:1px solid #f0c4b6;color:var(--red);
+    border-radius:12px;padding:12px 16px;font-size:13px;margin-bottom:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:14px;
+    box-shadow:0 10px 28px rgba(20,40,71,.07);overflow:hidden}
+  .ch{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line)}
+  .ch .t{font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:700}
+  .ch .r{font-size:11px;color:var(--dim)}
+  .cb{padding:18px 20px}
 
-  .card{background:var(--card);border:1px solid var(--card-border);border-radius:22px;padding:20px;margin-bottom:16px;
-    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-    box-shadow:0 18px 44px rgba(108,76,240,.08)}
-  .card-label{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:var(--dim);margin-bottom:14px;font-weight:500}
+  .owner{display:inline-flex;align-items:center;gap:8px;background:#eef4ff;border:1px solid #c9daff;
+    color:var(--blue);font-weight:600;font-size:12px;padding:7px 13px;border-radius:99px;margin-bottom:14px}
+  .owner b{font-weight:700}
 
-  .cons-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-  .cons-title{font-family:'Unbounded';font-size:14px;font-weight:600}
-  .badge{font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border-radius:99px;font-weight:600}
-  .badge.miss{background:rgba(240,70,140,.1);color:var(--aurora-3)}
-  .badge.win{background:rgba(11,191,147,.15);color:#067a5d;box-shadow:0 0 0 1.5px rgba(11,191,147,.4)}
-  .badge.wait{background:rgba(21,23,43,.06);color:var(--dim)}
-  .duel{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
-  .side{text-align:center}
-  .side .lab{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:7px}
-  .side .big{font-family:'Unbounded';font-weight:800;font-size:clamp(26px,8vw,34px);letter-spacing:.05em}
-  .side.user .big{color:var(--aurora-2)}
-  .side.draw .big{color:var(--ink)}
-  .side .small{font-size:11px;color:var(--dim);margin-top:5px}
-  .delta{display:flex;flex-direction:column;align-items:center;gap:3px}
-  .delta .n{font-family:'Unbounded';font-weight:800;font-size:16px;min-width:46px;height:46px;padding:0 6px;border-radius:99px;
-    display:flex;align-items:center;justify-content:center;color:#fff}
-  .delta.miss .n{background:linear-gradient(135deg,var(--aurora-3),#c4256b)}
-  .delta.win .n{background:linear-gradient(135deg,var(--aurora-1),#067a5d)}
-  .delta.wait .n{background:#c9ccdd}
-  .delta .t{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
-  .others{display:flex;gap:7px;justify-content:center;margin-top:13px;padding-top:13px;border-top:1px dashed var(--card-border);flex-wrap:wrap}
-  .chip{font-family:'Unbounded';font-size:11px;font-weight:600;padding:6px 11px;border-radius:10px;
-    background:rgba(108,76,240,.08);color:var(--aurora-2)}
-  .prox-tag{font-size:11px;color:var(--dim);text-align:center;margin-top:10px}
+  .res-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+  .res-top .d{font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700}
+  .res-top .c{font-size:11px;color:var(--dim)}
 
-  .premios{display:flex;flex-direction:column;gap:8px}
-  .premio{display:flex;align-items:center;gap:13px}
-  .premio .ord{font-family:'Unbounded';font-size:10px;color:var(--dim);width:20px}
-  .premio .num{font-family:'Unbounded';font-size:18px;font-weight:600;letter-spacing:.13em;color:#9aa0bd}
-  .premio .num b{color:var(--ink);font-weight:800}
-  .premio .tag{margin-left:auto;font-size:10px;color:var(--dim)}
-  .fonte{margin-top:12px;font-size:11px;color:var(--dim)}
-  .vazio{font-size:13px;color:var(--dim);text-align:center;padding:14px 0;line-height:1.5}
+  .first{display:flex;align-items:center;gap:18px;background:#f8fafd;border:1px solid var(--line);
+    border-radius:12px;padding:16px 18px;margin-top:14px}
+  .first.best{border-color:#c9daff;background:#f4f8ff}
+  .first .lab{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);font-weight:600}
+  .first .n{font-family:'JetBrains Mono',monospace;font-size:38px;font-weight:700;letter-spacing:.06em;line-height:1.1}
+  .first .n span{color:#bcc6d8}
+  .first .deriv{margin-left:auto;text-align:right;font-size:11px;color:var(--dim);line-height:1.9}
+  .first .deriv b{font-family:'JetBrains Mono',monospace;color:var(--ink);font-size:13px}
 
-  .evento{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px dashed var(--card-border);font-size:13px}
-  .evento:last-child{border-bottom:none}
-  .evento .d{font-family:'Unbounded';font-weight:600;font-size:13px}
-  .evento .c{color:var(--dim)}
+  .rest{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .mini{flex:1;min-width:0;text-align:center;font-size:10px;color:var(--dim);padding:7px 4px;
+    border:1px dashed var(--line);border-radius:8px}
+  .mini .n{display:block;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;color:#5a6682;margin-top:2px;letter-spacing:.04em}
+  .mini.best{border-style:solid;border-color:#c9daff;background:#f4f8ff}
+  .mini.best .n{color:var(--blue);font-weight:700}
+  .res-src{display:flex;justify-content:space-between;margin-top:14px;font-size:11px;color:var(--dim)}
+  .res-src .ok{color:var(--green);font-weight:600}
+  .vazio{font-size:13px;color:var(--dim);text-align:center;padding:16px 0;line-height:1.6}
 
-  .actions{display:flex;gap:12px;margin-top:6px}
-  button{flex:1;font-family:'Outfit';font-size:14px;font-weight:600;padding:16px;border-radius:16px;border:none;cursor:pointer;transition:transform .15s}
+  .crow{display:flex;align-items:center;gap:14px;padding:15px 20px;border-bottom:1px solid var(--line)}
+  .crow:last-child{border-bottom:none}
+  .crow.off{opacity:.78}
+  .crow .ico{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+    font-size:19px;background:var(--bg);flex-shrink:0}
+  .crow .info{flex:1;min-width:0}
+  .crow .nm{font-weight:600;font-size:14px}
+  .crow .dt{font-size:11px;color:var(--dim);margin-top:2px}
+  .crow .dt b{font-family:'JetBrains Mono',monospace;color:var(--ink);font-weight:500}
+  .crow .gap{font-size:11px;color:var(--dim);margin-top:5px}
+  .crow .gap b{font-family:'JetBrains Mono',monospace;color:var(--ink)}
+  .chipst{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;letter-spacing:.06em;
+    text-transform:uppercase;padding:5px 10px;border-radius:99px;white-space:nowrap}
+  .chipst.miss{background:#fdeae5;color:var(--red)}
+  .chipst.win{background:#e2f6ee;color:var(--green)}
+  .chipst.idle{background:#edf0f5;color:var(--dim)}
+
+  .next-hero{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,var(--navy),var(--navy-2));
+    color:#fff;border-radius:12px;padding:16px 18px;margin-bottom:12px}
+  .next-hero .big{font-family:'Bricolage Grotesque',sans-serif;font-size:34px;font-weight:800;line-height:1;min-width:56px}
+  .next-hero .big small{display:block;font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+    color:#8fa3c8;margin-top:4px}
+  .next-hero .what{flex:1;border-left:1px solid rgba(255,255,255,.18);padding-left:16px}
+  .next-hero .what .t{font-weight:600;font-size:14px}
+  .next-hero .what .s{font-size:11px;color:#aebbd6;margin-top:3px}
+  .next-hero .eta{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#7ef2c0;white-space:nowrap}
+  .evlist .ev{display:flex;align-items:center;gap:14px;padding:11px 20px;border-bottom:1px solid var(--line)}
+  .evlist .ev:last-child{border-bottom:none}
+  .evlist .dt{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;width:52px}
+  .evlist .lbl{flex:1;font-size:13px}
+  .evlist .lbl small{color:var(--dim)}
+  .evlist .eta{font-size:11px;color:var(--dim)}
+
+  .actions{display:flex;gap:10px;margin-top:2px}
+  button{flex:1;font-family:'Instrument Sans';font-size:14px;font-weight:600;padding:15px;border-radius:11px;
+    border:none;cursor:pointer;transition:transform .12s, box-shadow .12s}
   button:active{transform:scale(.97)}
-  .btn-main{background:linear-gradient(90deg,var(--aurora-1),var(--aurora-2));color:#fff;box-shadow:0 10px 24px rgba(108,76,240,.25)}
-  .btn-main[disabled]{opacity:.6}
-  .btn-ghost{background:#fff;border:1px solid var(--card-border);color:var(--ink)}
+  .b1{background:var(--blue);color:#fff;box-shadow:0 8px 20px rgba(47,107,255,.3)}
+  .b1[disabled]{opacity:.6}
+  .b2{background:#fff;border:1px solid var(--line);color:var(--ink)}
 
-  #manual{display:none;margin-top:16px}
+  #manual{display:none}
   #manual.aberto{display:block}
   #manual .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
   #manual label{font-size:11px;color:var(--dim);display:block;margin-bottom:4px}
-  #manual input{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--card-border);
-    font-family:'Outfit';font-size:15px;background:#fff;color:var(--ink)}
-  #manual input:focus{outline:2px solid var(--aurora-2)}
+  #manual input{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);
+    font-family:'Instrument Sans';font-size:15px;background:#fff;color:var(--ink)}
+  #manual input:focus{outline:2px solid var(--blue)}
 
   .status-line{display:flex;gap:14px;justify-content:center;margin-top:18px;font-size:11px;color:var(--dim)}
   .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}
-  .dot.on{background:var(--aurora-1)}
-  .dot.off{background:#c9ccdd}
-  footer{margin-top:22px;text-align:center;font-size:11px;color:var(--dim);line-height:1.6}
+  .dot.on{background:var(--green)}
+  .dot.off{background:#c3cad8}
+  footer{margin-top:24px;text-align:center;font-size:11px;color:var(--dim);line-height:1.6}
+
+  .rise{animation:rise .6s cubic-bezier(.2,.7,.3,1) both}
+  .rise:nth-child(2){animation-delay:.08s}.rise:nth-child(3){animation-delay:.16s}
+  .rise:nth-child(4){animation-delay:.24s}.rise:nth-child(5){animation-delay:.32s}
+  .rise:nth-child(6){animation-delay:.4s}.rise:nth-child(7){animation-delay:.48s}
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
-<canvas id="bg"></canvas>
-<div class="veil"></div>
 <div class="wrap">
-  <header>
-    <div class="kicker">Consórcios Control · Ademicon</div>
-    <h1>Suas cotas <em>vs. a sorte</em></h1>
-    {% if proximos %}
-    <div class="next"><span class="pulse"></span>&nbsp;Próxima extração:
-      <b style="color:var(--ink)">&nbsp;{{ proximos[0].extracao.strftime('%d/%m') }} ·
-      {% for card in cards if card.cons.id == proximos[0].consorcio_id %}{{ card.cons.nome }}{% endfor %}</b>
+  <div class="band">
+    <div class="k">Consórcios Control · Ademicon</div>
+    <h1>Central de Sorteios</h1>
+    <div class="sub">
+      {% if atualizado_em %}Última verificação: <b>{{ atualizado_em.strftime('%d/%m/%Y às %H:%M') }}</b>
+      {% else %}Aguardando primeira verificação{% endif %}
     </div>
-    {% endif %}
-  </header>
-
-  {% if erro %}<div class="alert">⚠️ {{ erro }}</div>{% endif %}
-
-  {% for card in cards %}
-  <div class="card" data-anim>
-    <div class="cons-head">
-      <span class="cons-title">{{ card.cons.emoji }} {{ card.cons.nome }} · G.{{ card.cons.grupo }}</span>
-      {% if card.analise is none %}
-        <span class="badge wait">Aguardando</span>
-      {% elif card.analise.contemplado %}
-        <span class="badge win">Contemplado! 🎉</span>
-      {% else %}
-        <span class="badge miss">Não contemplado</span>
-      {% endif %}
-    </div>
-    {% set m = card.analise.melhor if card.analise else none %}
-    <div class="duel">
-      <div class="side user">
-        <div class="lab">Sua cota</div>
-        <div class="big">{{ m.numero_usuario if m else card.cons.cota }}</div>
-        <div class="small">{% if m and m.numero_usuario != card.cons.cota %}equivalente de {{ card.cons.cota }}{% else %}cota {{ card.cons.cota }}{% endif %}</div>
-      </div>
-      <div class="delta {{ 'wait' if not m else ('win' if card.analise.contemplado else 'miss') }}">
-        <span class="n">{{ m.distancia if m else '—' }}</span>
-        <span class="t">dist.</span>
-      </div>
-      <div class="side draw">
-        <div class="lab">Sorteado</div>
-        <div class="big">{{ m.numero if m else '····' }}</div>
-        <div class="small">{% if m %}{{ m.ordem }}º prêmio{% if m.direcao and m.distancia %} · {{ m.distancia }} {{ m.direcao }}{% endif %}{% else %}sem resultado ainda{% endif %}</div>
-      </div>
-    </div>
-    {% if card.cons.regra.equivalentes | length > 1 %}
-    <div class="others">
-      {% for off in card.cons.regra.equivalentes %}<span class="chip">{{ card.cons.cota + off }}</span>{% endfor %}
-    </div>
-    {% endif %}
-    {% if card.proxima %}<div class="prox-tag">📅 Próxima extração: {{ card.proxima.strftime('%d/%m/%Y') }}</div>{% endif %}
   </div>
-  {% endfor %}
 
-  <div class="card" data-anim>
-    {% if resultado %}
-    <div class="card-label">Resultado · Extração {{ resultado.data.strftime('%d/%m/%Y') }}</div>
-    <div class="premios">
-      {% for p in resultado.premios %}
-      <div class="premio">
-        <span class="ord">{{ loop.index }}º</span>
-        <span class="num">{{ p[:1] }}<b>{{ p[1:] }}</b></span>
-        <span class="tag">milhar {{ p[-4:] }} · centena {{ p[-3:] }}</span>
+  <div class="stack">
+    {% if erro %}<div class="alert rise">⚠️ {{ erro }}</div>{% endif %}
+
+    <div class="card rise">
+      <div class="ch"><span class="t">Último sorteio</span><span class="r">Loteria Federal</span></div>
+      <div class="cb">
+        {% if resultado %}
+        {% for dono in donos %}
+        <div class="owner">{{ dono.emoji }} Este sorteio vale para o&nbsp;<b>Consórcio {{ dono.nome }} · Cota {{ dono.cota }}</b></div>
+        {% endfor %}
+        <div class="res-top">
+          <span class="d">{{ resultado.data.strftime('%d/%m/%Y') }}</span>
+          <span class="c">{% if resultado.concurso %}concurso {{ '{:,}'.format(resultado.concurso).replace(',', '.') }} · {% endif %}{{ res_dia_semana }}</span>
+        </div>
+        {% set p0 = resultado.premios[0] %}
+        {% set p0_resto = p0.lstrip('0') or '0' %}
+        <div class="first {{ 'best' if ordem_destaque == 1 }}">
+          <div>
+            <div class="lab">1º Prêmio</div>
+            <div class="n"><span>{{ p0[:p0|length - p0_resto|length] }}</span>{{ p0_resto }}</div>
+          </div>
+          <div class="deriv">milhar <b>{{ p0[-4:] }}</b><br>centena <b>{{ p0[-3:] }}</b></div>
+        </div>
+        <div class="rest">
+          {% for p in resultado.premios[1:] %}
+          <div class="mini {{ 'best' if ordem_destaque == loop.index + 1 }}">{{ loop.index + 1 }}º<span class="n">{{ p }}</span></div>
+          {% endfor %}
+        </div>
+        <div class="res-src">
+          <span>{% if resultado.origem == 'manual' %}Origem: input manual{% else %}Fonte: API oficial da Caixa{% endif %}</span>
+          <span class="ok">✓ verificado</span>
+        </div>
+        {% else %}
+        <div class="vazio">Nenhum resultado carregado ainda.<br>Toque em <b>Atualizar agora</b> ou insira manualmente.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card rise">
+      <div class="ch"><span class="t">Suas cotas</span><span class="r">situação atual</span></div>
+      {% for card in cards %}
+      <div class="crow {{ 'off' if not card.participou }}">
+        <div class="ico">{{ card.cons.emoji }}</div>
+        <div class="info">
+          <div class="nm">{{ card.cons.nome }} · Cota <span class="mono" style="font-weight:700">{{ card.cons.cota }}</span></div>
+          <div class="dt">grupo {{ card.cons.grupo }}{% if card.cons.regra.equivalentes | length > 1 %} · equivalentes
+            {%- for off in card.cons.regra.equivalentes %}{% if off %} <b>{{ card.cons.cota + off }}</b>{% endif %}{% endfor %}{% endif %} · regra de {{ card.cons.unidade }}</div>
+          {% if card.participou and card.analise %}
+            {% set m = card.analise.melhor %}
+            {% if card.analise.contemplado %}
+            <div class="gap">sorteio de {{ resultado.data.strftime('%d/%m') }}: o {{ m.ordem }}º prêmio tirou {{ card.cons.unidade }} <b>{{ m.numero }}</b> 🎉</div>
+            {% elif m %}
+            <div class="gap">sorteio de {{ resultado.data.strftime('%d/%m') }}: mais próximo foi o {{ m.ordem }}º prêmio ({{ card.cons.unidade[:3] }} <b>{{ m.numero }}</b>) · distância <b>{{ m.distancia }}</b></div>
+            {% endif %}
+          {% elif not card.participou %}
+            <div class="gap">não participou {% if resultado %}do sorteio de {{ resultado.data.strftime('%d/%m') }}{% endif %}{% if card.proxima %} · concorre em <b>{{ card.proxima.strftime('%d/%m') }}</b>{% endif %}</div>
+          {% endif %}
+        </div>
+        <div class="st">
+          {% if card.participou and card.analise %}
+            {% if card.analise.contemplado %}<span class="chipst win">contemplada 🎉</span>
+            {% else %}<span class="chipst miss">não contemplada</span>{% endif %}
+          {% elif not card.participou and card.proxima %}
+            <span class="chipst idle">aguarda {{ card.proxima.strftime('%d/%m') }}</span>
+          {% else %}
+            <span class="chipst idle">aguardando</span>
+          {% endif %}
+        </div>
       </div>
       {% endfor %}
     </div>
-    <div class="fonte">
-      {% if resultado.origem == 'manual' %}Origem: input manual{% else %}Fonte: API oficial da Caixa · concurso {{ resultado.concurso }}{% endif %}
-      {% if atualizado_em %} · atualizado {{ atualizado_em.strftime('%d/%m %H:%M') }}{% endif %}
-    </div>
-    {% else %}
-    <div class="card-label">Resultado</div>
-    <div class="vazio">Nenhum resultado carregado ainda.<br>Toque em <b>Atualizar agora</b> ou insira manualmente.</div>
-    {% endif %}
-  </div>
 
-  <div class="card" data-anim>
-    <div class="card-label">Próximas datas</div>
-    {% for e in proximos %}
-    <div class="evento">
-      <span class="d">{{ e.extracao.strftime('%d/%m') }}</span>
-      <span class="c">{% for card in cards if card.cons.id == e.consorcio_id %}{{ card.cons.emoji }} {{ card.cons.nome }}{% endfor %} · extração</span>
-    </div>
-    {% else %}
-    <div class="vazio">Calendário vazio.</div>
-    {% endfor %}
-  </div>
-
-  <div class="actions" data-anim>
-    <button class="btn-main" id="btn-refresh">Atualizar agora</button>
-    <button class="btn-ghost" id="btn-manual">Inserir manual</button>
-  </div>
-
-  <div class="card" id="manual">
-    <div class="card-label">Resultado manual (fallback)</div>
-    <form method="post" action="/manual-result">
-      <div class="grid">
-        <div style="grid-column:1/-1"><label>Data da extração</label>
-          <input type="date" name="data" required value="{{ hoje.isoformat() }}"></div>
-        <div><label>1º prêmio (5 dígitos)</label><input name="p1" required pattern="\d{5}" inputmode="numeric" maxlength="5" placeholder="00000"></div>
-        <div><label>2º prêmio</label><input name="p2" required pattern="\d{5}" inputmode="numeric" maxlength="5" placeholder="00000"></div>
-        <div><label>3º prêmio</label><input name="p3" required pattern="\d{5}" inputmode="numeric" maxlength="5" placeholder="00000"></div>
-        <div><label>4º prêmio</label><input name="p4" required pattern="\d{5}" inputmode="numeric" maxlength="5" placeholder="00000"></div>
-        <div><label>5º prêmio</label><input name="p5" required pattern="\d{5}" inputmode="numeric" maxlength="5" placeholder="00000"></div>
-        <div><label>Concurso (opcional)</label><input name="concurso" inputmode="numeric" placeholder="0" value="0"></div>
+    {% if proximos %}
+    {% set nx = proximos[0] %}
+    <div class="next-hero rise">
+      <div class="big">{{ nx.evento.extracao.day }}<small>{{ nx.mes_nome }}</small></div>
+      <div class="what">
+        <div class="t">{{ nx.cons.emoji if nx.cons }} {{ nx.cons.nome if nx.cons else nx.evento.consorcio_id }} — próxima extração</div>
+        <div class="s">{{ nx.dia_semana }}{% if nx.evento.assembleia %} · assembleia em {{ nx.evento.assembleia.strftime('%d/%m') }}{% endif %}</div>
       </div>
-      <button class="btn-main" type="submit" style="width:100%">Analisar resultado</button>
-    </form>
-  </div>
+      <span class="eta">{% if nx.dias == 0 %}É HOJE{% elif nx.dias == 1 %}AMANHÃ{% else %}EM {{ nx.dias }} DIAS{% endif %}</span>
+    </div>
+    {% endif %}
 
-  <div class="status-line">
-    <span><span class="dot {{ 'on' if sheets_ok else 'off' }}"></span>Google Sheets</span>
-    <span><span class="dot {{ 'on' if telegram_ok else 'off' }}"></span>Telegram</span>
-  </div>
+    {% if proximos | length > 1 %}
+    <div class="card rise evlist">
+      <div class="ch"><span class="t">Datas seguintes</span><span class="r">calendário</span></div>
+      {% for pv in proximos[1:] %}
+      <div class="ev">
+        <span class="dt">{{ pv.evento.extracao.strftime('%d/%m') }}</span>
+        <span class="lbl">{{ pv.cons.emoji if pv.cons }} {{ pv.cons.nome if pv.cons else pv.evento.consorcio_id }}
+          {% if pv.evento.assembleia %}<small>· assembleia {{ pv.evento.assembleia.strftime('%d/%m') }}</small>{% endif %}</span>
+        <span class="eta">{% if pv.dias == 0 %}hoje{% elif pv.dias == 1 %}amanhã{% else %}{{ pv.dias }} dias{% endif %}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
 
-  <footer>Análise matemática baseada nos regulamentos.<br>Não substitui a confirmação oficial da Ademicon.</footer>
+    <div class="actions rise">
+      <button class="b1" id="btn-refresh">Atualizar agora</button>
+      <button class="b2" id="btn-manual">Inserir manual</button>
+    </div>
+
+    <div class="card" id="manual">
+      <div class="ch"><span class="t">Resultado manual</span><span class="r">fallback</span></div>
+      <div class="cb">
+        <form method="post" action="/manual-result">
+          <div class="grid">
+            <div style="grid-column:1/-1"><label>Data da extração</label>
+              <input type="date" name="data" required value="{{ hoje.isoformat() }}"></div>
+            <div><label>1º prêmio (5 dígitos)</label><input name="p1" required pattern="\d{5}" inputmode="numeric" maxlength="5" placeholder="00000"></div>
+            <div><label>2º prêmio</label><input name="p2" required pattern="\d{5}" inputmode="numeric" maxlength="5" placeholder="00000"></div>
+            <div><label>3º prêmio</label><input name="p3" required pattern="\d{5}" inputmode="numeric" maxlength="5" placeholder="00000"></div>
+            <div><label>4º prêmio</label><input name="p4" required pattern="\d{5}" inputmode="numeric" maxlength="5" placeholder="00000"></div>
+            <div><label>5º prêmio</label><input name="p5" required pattern="\d{5}" inputmode="numeric" maxlength="5" placeholder="00000"></div>
+            <div><label>Concurso (opcional)</label><input name="concurso" inputmode="numeric" placeholder="0" value="0"></div>
+          </div>
+          <button class="b1" type="submit" style="width:100%">Analisar resultado</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="status-line">
+      <span><span class="dot {{ 'on' if sheets_ok else 'off' }}"></span>Google Sheets</span>
+      <span><span class="dot {{ 'on' if telegram_ok else 'off' }}"></span>Telegram</span>
+    </div>
+
+    <footer>Análise matemática baseada nos regulamentos.<br>Não substitui a confirmação oficial da Ademicon.</footer>
+  </div>
 </div>
 
 <script>
-// three.js: partículas aurora sobre fundo claro
-const canvas=document.getElementById('bg');
-const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-const scene=new THREE.Scene();
-const camera=new THREE.PerspectiveCamera(60,1,.1,100);camera.position.z=8;
-const N=700,pos=new Float32Array(N*3),col=new Float32Array(N*3);
-const palette=[[0.04,0.75,0.58],[0.42,0.30,0.94],[0.94,0.27,0.55]];
-for(let i=0;i<N;i++){
-  pos[i*3]=(Math.random()-.5)*16;pos[i*3+1]=(Math.random()-.5)*22;pos[i*3+2]=(Math.random()-.5)*8;
-  const c=palette[Math.floor(Math.random()*3)];col[i*3]=c[0];col[i*3+1]=c[1];col[i*3+2]=c[2];
-}
-const geo=new THREE.BufferGeometry();
-geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
-geo.setAttribute('color',new THREE.BufferAttribute(col,3));
-const pts=new THREE.Points(geo,new THREE.PointsMaterial({size:.06,vertexColors:true,transparent:true,opacity:.5,depthWrite:false}));
-scene.add(pts);
-function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}
-addEventListener('resize',resize);resize();
-let t=0;
-(function loop(){t+=.0032;pts.rotation.y=t*.4;pts.rotation.x=Math.sin(t*.6)*.1;
-  renderer.render(scene,camera);requestAnimationFrame(loop)})();
-
-gsap.from('header > *',{y:20,opacity:0,duration:.8,stagger:.1,ease:'power3.out'});
-gsap.from('[data-anim]',{y:34,opacity:0,duration:.8,stagger:.14,delay:.25,ease:'power3.out'});
-
 document.getElementById('btn-manual').addEventListener('click',()=>{
   document.getElementById('manual').classList.toggle('aberto');
 });
