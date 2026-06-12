@@ -1,7 +1,8 @@
-"""Busca o resultado da Loteria Federal na API JSON oficial da Caixa.
+"""Busca o resultado da Loteria Federal com fontes em cascata.
 
-Endpoint descoberto no protótipo: muito mais confiável que raspar o
-portal .aspx (que depende de JavaScript pesado).
+1. API JSON oficial da Caixa (servicebus2) — bloqueia IPs de datacenter
+   estrangeiro (403 no Render), mas é a fonte canônica quando acessível.
+2. Espelho comunitário loteriascaixa-api — mesmos dados, sem geo-bloqueio.
 """
 from __future__ import annotations
 
@@ -16,39 +17,68 @@ from .models import ResultadoLoteria
 
 log = logging.getLogger(__name__)
 
-URL = "https://servicebus2.caixa.gov.br/portaldeloterias/api/federal"
+URL_CAIXA = "https://servicebus2.caixa.gov.br/portaldeloterias/api/federal"
+URL_ESPELHO = "https://loteriascaixa-api.herokuapp.com/api/federal/latest"
 HEADERS = {
     "Accept": "application/json",
-    "User-Agent": "Mozilla/5.0 (compatible; ConsorciosControl/1.0)",
+    "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                   "AppleWebKit/537.36 (KHTML, like Gecko) "
+                   "Chrome/126.0.0.0 Safari/537.36"),
 }
-TENTATIVAS = 3
+RODADAS = 2
 TIMEOUT = 20
 
 
 class LoteriaIndisponivel(Exception):
-    """API da Caixa fora do ar ou resposta inválida."""
+    """Nenhuma fonte respondeu com um resultado válido."""
+
+
+def _premios(lista: list) -> list[str]:
+    """Normaliza para 5 prêmios de exatamente 5 dígitos (bilhete da Federal)."""
+    premios = [re.sub(r"\D", "", str(p))[-5:].zfill(5) for p in lista]
+    if len(premios) < 5 or any(len(p) != 5 for p in premios):
+        raise ValueError(f"lista de prêmios inesperada: {lista}")
+    return premios[:5]
+
+
+def _parse_caixa(dados: dict) -> ResultadoLoteria:
+    return ResultadoLoteria(
+        concurso=int(dados["numero"]),
+        data=datetime.strptime(dados["dataApuracao"], "%d/%m/%Y").date(),
+        premios=_premios(dados["listaDezenas"]),
+        origem="caixa",
+    )
+
+
+def _parse_espelho(dados: dict) -> ResultadoLoteria:
+    return ResultadoLoteria(
+        concurso=int(dados["concurso"]),
+        data=datetime.strptime(dados["data"], "%d/%m/%Y").date(),
+        premios=_premios(dados["dezenas"]),
+        origem="espelho",
+    )
+
+
+FONTES = [
+    ("caixa", URL_CAIXA, _parse_caixa),
+    ("espelho", URL_ESPELHO, _parse_espelho),
+]
 
 
 def buscar_resultado() -> ResultadoLoteria:
-    """Último resultado da Federal. Levanta LoteriaIndisponivel após retries."""
+    """Último resultado da Federal. Levanta LoteriaIndisponivel se todas as
+    fontes falharem em todas as rodadas."""
     ultimo_erro: Exception | None = None
-    for tentativa in range(1, TENTATIVAS + 1):
-        try:
-            resp = requests.get(URL, headers=HEADERS, timeout=TIMEOUT)
-            resp.raise_for_status()
-            dados = resp.json()
-            premios = [re.sub(r"\D", "", str(p)) for p in dados["listaDezenas"]]
-            if len(premios) < 5 or any(len(p) < 5 for p in premios):
-                raise ValueError(f"listaDezenas inesperada: {dados['listaDezenas']}")
-            return ResultadoLoteria(
-                concurso=int(dados["numero"]),
-                data=datetime.strptime(dados["dataApuracao"], "%d/%m/%Y").date(),
-                premios=premios[:5],
-                origem="caixa",
-            )
-        except Exception as exc:  # rede, JSON, schema — tudo vira retry
-            ultimo_erro = exc
-            log.warning("Tentativa %s/%s falhou: %s", tentativa, TENTATIVAS, exc)
-            if tentativa < TENTATIVAS:
-                time.sleep(2 * tentativa)
+    for rodada in range(1, RODADAS + 1):
+        for nome, url, parse in FONTES:
+            try:
+                resp = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+                resp.raise_for_status()
+                return parse(resp.json())
+            except Exception as exc:  # rede, JSON, schema — tenta a próxima
+                ultimo_erro = exc
+                log.warning("Fonte %s falhou (rodada %s/%s): %s",
+                            nome, rodada, RODADAS, exc)
+        if rodada < RODADAS:
+            time.sleep(2 * rodada)
     raise LoteriaIndisponivel(str(ultimo_erro))

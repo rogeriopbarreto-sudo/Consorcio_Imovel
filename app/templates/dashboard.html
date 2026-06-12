@@ -127,7 +127,9 @@
 <body>
 <div class="wrap">
   <div class="band">
-    <div class="k">Consórcios Control · Ademicon</div>
+    <div class="k" style="display:flex;justify-content:space-between;align-items:baseline">
+      <span>Consórcios Control · Ademicon</span><span style="letter-spacing:.08em;text-transform:none">Rogério Barreto</span>
+    </div>
     <h1>Central de Sorteios</h1>
     <div class="sub">
       {% if atualizado_em %}Última verificação: <b>{{ atualizado_em.strftime('%d/%m/%Y às %H:%M') }}</b>
@@ -137,6 +139,18 @@
 
   <div class="stack">
     {% if erro %}<div class="alert rise">⚠️ {{ erro }}</div>{% endif %}
+
+    {% if proximos %}
+    {% set nx = proximos[0] %}
+    <div class="next-hero rise">
+      <div class="big">{{ nx.evento.extracao.day }}<small>{{ nx.mes_nome }}</small></div>
+      <div class="what">
+        <div class="t">{{ nx.cons.emoji if nx.cons }} {{ nx.cons.nome if nx.cons else nx.evento.consorcio_id }} — próxima extração</div>
+        <div class="s">{{ nx.dia_semana }}{% if nx.evento.assembleia %} · assembleia em {{ nx.evento.assembleia.strftime('%d/%m') }}{% endif %}</div>
+      </div>
+      <span class="eta">{% if nx.dias == 0 %}É HOJE{% elif nx.dias == 1 %}AMANHÃ{% else %}EM {{ nx.dias }} DIAS{% endif %}</span>
+    </div>
+    {% endif %}
 
     <div class="card rise">
       <div class="ch"><span class="t">Último sorteio</span><span class="r">Loteria Federal</span></div>
@@ -164,7 +178,7 @@
           {% endfor %}
         </div>
         <div class="res-src">
-          <span>{% if resultado.origem == 'manual' %}Origem: input manual{% else %}Fonte: API oficial da Caixa{% endif %}</span>
+          <span>{% if resultado.origem == 'manual' %}Origem: input manual{% elif resultado.origem == 'espelho' %}Fonte: espelho da Loteria Federal{% else %}Fonte: API oficial da Caixa{% endif %}</span>
           <span class="ok">✓ verificado</span>
         </div>
         {% else %}
@@ -206,18 +220,6 @@
       </div>
       {% endfor %}
     </div>
-
-    {% if proximos %}
-    {% set nx = proximos[0] %}
-    <div class="next-hero rise">
-      <div class="big">{{ nx.evento.extracao.day }}<small>{{ nx.mes_nome }}</small></div>
-      <div class="what">
-        <div class="t">{{ nx.cons.emoji if nx.cons }} {{ nx.cons.nome if nx.cons else nx.evento.consorcio_id }} — próxima extração</div>
-        <div class="s">{{ nx.dia_semana }}{% if nx.evento.assembleia %} · assembleia em {{ nx.evento.assembleia.strftime('%d/%m') }}{% endif %}</div>
-      </div>
-      <span class="eta">{% if nx.dias == 0 %}É HOJE{% elif nx.dias == 1 %}AMANHÃ{% else %}EM {{ nx.dias }} DIAS{% endif %}</span>
-    </div>
-    {% endif %}
 
     {% if proximos | length > 1 %}
     <div class="card rise evlist">
