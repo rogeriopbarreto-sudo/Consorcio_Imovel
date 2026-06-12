@@ -8,3 +8,4 @@ pydantic
 pydantic-settings
 pytest
 python-multipart
+tzdata
