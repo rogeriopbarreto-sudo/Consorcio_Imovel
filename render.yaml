@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: consorcios-control
+    name: consorciosrpb
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
