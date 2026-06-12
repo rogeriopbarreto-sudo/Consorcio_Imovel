@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barra A · Azul Royal — Consórcios Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#142847;--bg:#eef1f6;--ink:#16213a;--dim:#75809a;--line:#dde3ee;--blue:#2f6bff}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--ink)}
+  .tag{position:fixed;top:10px;right:12px;background:#fff;border:1px solid var(--line);border-radius:8px;
+    padding:6px 12px;font-size:12px;font-weight:600;z-index:9}
+  .wrap{max-width:560px;margin:0 auto;padding:0 18px 56px}
+  .band{background:var(--navy);color:#fff;margin:0 -18px;padding:30px 26px 64px;position:relative;overflow:hidden}
+  .band::after{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;
+    background:radial-gradient(circle,rgba(47,107,255,.35),transparent 70%)}
+  .band .k{font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:#8fa3c8;font-weight:600;
+    display:flex;justify-content:space-between;align-items:baseline}
+  .band .k span:last-child{letter-spacing:.08em;text-transform:none}
+  .band h1{font-family:'Bricolage Grotesque',sans-serif;font-size:27px;font-weight:800;margin-top:8px}
+  .band .sub{font-size:13px;color:#aebbd6;margin-top:6px}
+  .band .sub b{color:#fff;font-weight:600}
+  .stack{margin-top:-38px;position:relative;z-index:2}
+
+  /* VARIANTE A: azul royal vivo */
+  .next-hero{display:flex;align-items:center;gap:16px;
+    background:linear-gradient(135deg,#2f6bff,#1840b8);
+    box-shadow:0 12px 30px rgba(47,107,255,.35);
+    color:#fff;border-radius:12px;padding:16px 18px;margin-bottom:12px}
+  .next-hero .big{font-family:'Bricolage Grotesque',sans-serif;font-size:34px;font-weight:800;line-height:1;min-width:56px}
+  .next-hero .big small{display:block;font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+    color:#bcd2ff;margin-top:4px}
+  .next-hero .what{flex:1;border-left:1px solid rgba(255,255,255,.25);padding-left:16px}
+  .next-hero .what .t{font-weight:600;font-size:14px}
+  .next-hero .what .s{font-size:11px;color:#cfe0ff;margin-top:3px}
+  .next-hero .eta{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#9ef7cf;white-space:nowrap}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 28px rgba(20,40,71,.07)}
+  .ch{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line)}
+  .ch .t{font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:700}
+  .ch .r{font-size:11px;color:var(--dim)}
+  .cb{padding:18px 20px;color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<div class="tag">A · Azul Royal</div>
+<div class="wrap">
+  <div class="band">
+    <div class="k"><span>Consórcios Control · Ademicon</span><span>Rogério Barreto</span></div>
+    <h1>Central de Sorteios</h1>
+    <div class="sub">Última verificação: <b>12/06/2026 às 14:32</b></div>
+  </div>
+  <div class="stack">
+    <div class="next-hero">
+      <div class="big">17<small>junho</small></div>
+      <div class="what">
+        <div class="t">🏠 Imóvel — próxima extração</div>
+        <div class="s">quarta-feira · assembleia em 19/06</div>
+      </div>
+      <span class="eta">EM 5 DIAS</span>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="t">Último sorteio</span><span class="r">Loteria Federal</span></div>
+      <div class="cb">(conteúdo do dashboard…)</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
