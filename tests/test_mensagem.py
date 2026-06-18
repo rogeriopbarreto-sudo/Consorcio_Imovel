@@ -13,7 +13,9 @@ def test_linha_primeiro_premio_imovel():
     assert linha is not None
     assert linha.startswith("1º prêmio: 53952,")
     assert "milhar" in linha and "3952" in linha
-    assert "do seu" in linha and ("acima" in linha or "abaixo" in linha)
+    assert "cota <b>619</b>" in linha             # 3952 - 3333 = 619 (reduzido)
+    assert "da sua cota <b>3311</b>" in linha
+    assert "acima" in linha or "abaixo" in linha
 
 
 def test_linha_primeiro_premio_veiculo():
@@ -23,4 +25,5 @@ def test_linha_primeiro_premio_veiculo():
     assert linha is not None
     assert linha.startswith("1º prêmio: 53952,")
     assert "centena" in linha and "952" in linha
-    assert "do seu" in linha
+    assert "→ cota" not in linha                  # centena = cota, sem redução
+    assert "da sua cota <b>974</b>" in linha

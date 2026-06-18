@@ -49,8 +49,8 @@
   .first .lab{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);font-weight:600}
   .first .n{font-family:'JetBrains Mono',monospace;font-size:38px;font-weight:700;letter-spacing:.06em;line-height:1.1}
   .first .n span{color:#bcc6d8}
-  .first .deriv{margin-left:auto;text-align:right;font-size:11px;color:var(--dim);line-height:1.9}
-  .first .deriv b{font-family:'JetBrains Mono',monospace;color:var(--ink);font-size:13px}
+  .first .deriv{margin-left:auto;text-align:right;font-size:13px;color:var(--dim);line-height:1.9}
+  .first .deriv b{font-family:'JetBrains Mono',monospace;color:var(--ink);font-size:15px}
 
   .rest{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
   .mini{flex:1;min-width:0;text-align:center;font-size:10px;color:var(--dim);padding:7px 4px;
@@ -175,7 +175,7 @@
             <div class="lab">1º Prêmio</div>
             <div class="n"><span>{{ p0[:p0|length - p0_resto|length] }}</span>{{ p0_resto }}</div>
           </div>
-          <div class="deriv">milhar <b>{{ p0[-4:] }}</b><br>centena <b>{{ p0[-3:] }}</b></div>
+          <div class="deriv">milhar <b>{{ p0[-4:] }}</b>{% if milhar_reduzido %} → cota <b>{{ milhar_reduzido }}</b>{% endif %}<br>centena <b>{{ p0[-3:] }}</b></div>
         </div>
         <div class="rest">
           {% for p in resultado.premios[1:] %}
@@ -204,9 +204,9 @@
           {% if card.participou and card.analise %}
             {% set m = card.analise.melhor %}
             {% if card.analise.contemplado %}
-            <div class="gap">sorteio de {{ resultado.data.strftime('%d/%m') }}: o {{ m.ordem }}º prêmio tirou {{ card.cons.unidade }} <b>{{ m.numero }}</b> 🎉</div>
+            <div class="gap">sorteio de {{ resultado.data.strftime('%d/%m') }}: o {{ m.ordem }}º prêmio tirou {{ card.cons.unidade }} <b>{{ m.numero }}</b>{% if m.cota_sorteada != m.numero|int %} → cota <b>{{ m.cota_sorteada }}</b>{% endif %} 🎉</div>
             {% elif m %}
-            <div class="gap">sorteio de {{ resultado.data.strftime('%d/%m') }}: mais próximo foi o {{ m.ordem }}º prêmio ({{ card.cons.unidade[:3] }} <b>{{ m.numero }}</b>) · distância <b>{{ m.distancia }}</b></div>
+            <div class="gap">sorteio de {{ resultado.data.strftime('%d/%m') }}: {{ m.ordem }}º prêmio — {{ card.cons.unidade }} <b>{{ m.numero }}</b>{% if m.cota_sorteada != m.numero|int %} → cota <b>{{ m.cota_sorteada }}</b>{% endif %} · a <b>{{ m.distancia }}</b> ({{ m.direcao }}) da sua cota <b>{{ card.cons.cota }}</b></div>
             {% endif %}
           {% elif not card.participou %}
             <div class="gap">não participou {% if resultado %}do sorteio de {{ resultado.data.strftime('%d/%m') }}{% endif %}{% if card.proxima %} · concorre em <b>{{ card.proxima.strftime('%d/%m') }}</b>{% endif %}</div>

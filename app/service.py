@@ -59,15 +59,24 @@ def _fmt_data(d: date) -> str:
     return d.strftime("%d/%m/%Y")
 
 
+def _unidade_cota(cons: Consorcio, p: matching.PremioAnalise) -> str:
+    """Ex.: 'milhar <b>3952</b> → cota <b>619</b>'. Mostra a redução ao espaço
+    de cotas só quando ela existe (no Veículo centena = cota, sem seta)."""
+    txt = f"{cons.unidade} <b>{p.numero}</b>"
+    if p.cota_sorteada is not None and p.cota_sorteada != int(p.numero):
+        txt += f" → cota <b>{p.cota_sorteada}</b>"
+    return txt
+
+
 def _linha_primeiro_premio(cons: Consorcio, analise: matching.Analise) -> str | None:
-    """Linha do 1º prêmio da Federal (bilhete completo) e sua distância à cota."""
+    """Linha do 1º prêmio: bilhete, cota sorteada (reduzida) e distância à sua cota."""
     p1 = next((p for p in analise.premios if p.ordem == 1), None)
     if p1 is None:
         return None
-    if p1.distancia is not None:
-        return (f"1º prêmio: {p1.bilhete}, {cons.unidade} <b>{p1.numero}</b> "
-                f"— a <b>{p1.distancia}</b> ({p1.direcao}) do seu "
-                f"<b>{p1.numero_usuario}</b>.")
+    if p1.cota_sorteada is not None:
+        return (f"1º prêmio: {p1.bilhete}, {_unidade_cota(cons, p1)} — "
+                f"a <b>{p1.distancia}</b> ({p1.direcao}) da sua cota "
+                f"<b>{cons.cota}</b>.")
     if p1.eliminado:
         return f"1º prêmio: {p1.bilhete}, {cons.unidade} {p1.numero} (eliminada)."
     return f"1º prêmio: {p1.bilhete} (sem {cons.unidade} válida)."
@@ -82,18 +91,21 @@ def _mensagem_telegram(cons: Consorcio, analise: matching.Analise,
     if analise.contemplado:
         m = analise.melhor
         corpo = (f"🎉 <b>COTA CONTEMPLADA!</b>\n"
-                 f"O {m.ordem}º prêmio tirou {cons.unidade} <b>{m.numero}</b>, "
-                 f"que corresponde à sua cota.\n\n"
+                 f"O {m.ordem}º prêmio tirou {_unidade_cota(cons, m)}, "
+                 f"que é a sua cota <b>{cons.cota}</b>.\n\n"
                  f"⚠️ Análise matemática — confirme com a Ademicon.")
     elif analise.melhor is not None:
         m = analise.melhor
         corpo = "Não foi dessa vez.\n"
         linha1 = _linha_primeiro_premio(cons, analise)
         if linha1:
-            corpo += linha1 + "\n"
-        corpo += (f"Mais perto: {m.ordem}º prêmio, {cons.unidade} "
-                  f"<b>{m.numero}</b> — a <b>{m.distancia}</b> "
-                  f"({m.direcao}) do seu <b>{m.numero_usuario}</b>.")
+            corpo += linha1
+        # A aproximação ancora no 1º prêmio. Só quando o 1º foi eliminado a
+        # âncora é outro prêmio (m.ordem ≠ 1) — aí mostramos a base usada.
+        if m.ordem != 1:
+            corpo += (f"\nBase do sorteio (1º prêmio eliminado): {m.ordem}º prêmio, "
+                      f"{_unidade_cota(cons, m)} — a <b>{m.distancia}</b> "
+                      f"({m.direcao}) da sua cota <b>{cons.cota}</b>.")
     else:
         corpo = "Nenhum prêmio válido para análise nesta extração."
     proximos = [e for e in proximos_eventos(res.data)

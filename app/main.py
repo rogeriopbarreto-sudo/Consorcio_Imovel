@@ -8,7 +8,7 @@ from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from . import service, sheets, telegram
+from . import matching, service, sheets, telegram
 from .config import carregar_consorcios, settings
 
 logging.basicConfig(level=logging.INFO,
@@ -99,6 +99,18 @@ def dashboard(request: Request):
         if a and a.melhor:
             ordem_destaque = a.melhor.ordem
 
+    # Redução do milhar do 1º prêmio ao espaço de cotas do grupo do Imóvel
+    # (3.333), para a barra do número sorteado. None quando não há redução.
+    milhar_reduzido = None
+    if res:
+        milhar_cons = next((c for c in consorcios if c.unidade == "milhar"), None)
+        if milhar_cons:
+            milhar_val = int(res.premios[0][-4:])
+            cota = matching.para_espaco_cotas(milhar_val,
+                                              milhar_cons.regra.como_regra())
+            if cota is not None and cota != milhar_val:
+                milhar_reduzido = cota
+
     cons_por_id = {c.id: c for c in consorcios}
     proximos_view = [{
         "evento": e,
@@ -116,6 +128,7 @@ def dashboard(request: Request):
         "ordem_destaque": ordem_destaque,
         "proximos": proximos_view,
         "atualizado_em": service.ESTADO["atualizado_em"],
+        "milhar_reduzido": milhar_reduzido,
         "erro": service.ESTADO["erro"],
         "sheets_ok": sheets.configurado(),
         "telegram_ok": telegram.configurado(),

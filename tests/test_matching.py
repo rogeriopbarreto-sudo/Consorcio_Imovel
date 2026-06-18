@@ -132,24 +132,28 @@ def test_milhar_0000_eliminada_na_analise():
     assert a.ordem_contemplada == 2
 
 
-def test_sem_match_melhor_aproximacao():
-    # cenário dos mockups: melhor é o 3º prêmio, milhar 6640, dist 4
+def test_sem_match_ancora_no_primeiro_premio():
+    # O 3º prêmio (milhar 6640) está a só 4 da cota, mas a regra Ademicon
+    # ancora a aproximação SEMPRE no 1º prêmio (milhar 8694 → cota 2028).
     premios = ["58694", "03317", "96640", "11972", "40975"]
     a = analisar(COTA_IMOVEL, IMOVEL, premios)
     assert a.contemplado is False
-    assert a.melhor.ordem == 3
-    assert a.melhor.numero == "6640"
-    assert a.melhor.distancia == 4
-    assert a.melhor.direcao == "abaixo"  # 6640 está 4 abaixo de 6644
-    assert a.melhor.numero_usuario == 6644
+    assert a.melhor.ordem == 1               # âncora, não o "mais perto"
+    assert a.melhor.numero == "8694"
+    assert a.melhor.distancia == 1283
+    assert a.melhor.direcao == "abaixo"      # 8694 está 1283 abaixo de 9977
+    assert a.melhor.numero_usuario == 9977
 
 
-def test_empate_entre_premios_vence_menor_ordem():
-    # 2º prêmio: 3315 (4 acima) e 4º prêmio: 3307 (4 abaixo) → vence o 2º
-    premios = ["18694", "23315", "31972", "43307", "50975"]
+def test_ancora_pula_primeiro_premio_eliminado():
+    # 1º prêmio milhar 0000 (eliminado) → âncora passa ao 1º prêmio válido (2º).
+    premios = ["10000", "23315", "33333", "44444", "55555"]
     a = analisar(COTA_IMOVEL, IMOVEL, premios)
-    assert a.melhor.ordem == 2
+    assert a.contemplado is False
+    assert a.premios[0].eliminado is True
+    assert a.melhor.ordem == 2               # 2º vira a base da aproximação
     assert a.melhor.distancia == 4
+    assert a.melhor.direcao == "acima"       # 3315 está 4 acima de 3311
 
 
 # ---------- análise completa: veículo ----------
@@ -169,15 +173,16 @@ def test_veiculo_centena_000_concorre():
     assert a.ordem_contemplada == 1
 
 
-def test_veiculo_proximidade():
-    # cenário dos mockups: 5º prêmio centena 975, 1 acima da cota 974
+def test_veiculo_ancora_no_primeiro_premio():
+    # O 5º prêmio (centena 975) está a só 1 da cota 974, mas a aproximação
+    # ancora no 1º prêmio (centena 694 → 280 abaixo de 974).
     premios = ["58694", "03317", "96640", "11972", "40975"]
     a = analisar(COTA_VEICULO, VEICULO, premios)
     assert a.contemplado is False
-    assert a.melhor.ordem == 5
-    assert a.melhor.numero == "975"
-    assert a.melhor.distancia == 1
-    assert a.melhor.direcao == "acima"
+    assert a.melhor.ordem == 1
+    assert a.melhor.numero == "694"
+    assert a.melhor.distancia == 280
+    assert a.melhor.direcao == "abaixo"
 
 
 def test_veiculo_ordem_dos_premios():

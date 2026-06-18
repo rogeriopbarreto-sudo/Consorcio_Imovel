@@ -105,8 +105,14 @@ def _equivalente_para_exibicao(extraido: int, cota: int, regra: RegraGrupo) -> i
 def analisar(cota: int, regra: RegraGrupo, premios: list[str]) -> Analise:
     """Analisa os 5 prêmios da Federal contra a cota do usuário.
 
-    Retorna match direto (distância 0) ou a melhor aproximação
-    (menor distância circular; empate entre prêmios → menor ordem).
+    Regra de contemplação Ademicon (Manual de Critérios de Contemplação por
+    Sorteio):
+    - Contemplação direta: a cota bate exatamente com a cota de algum dos 5
+      prêmios (1º ao 5º). Preferência pela menor ordem (1º antes do 2º…).
+    - Sem acerto exato: a busca por aproximação (um número acima, um abaixo,
+      alternando) parte SEMPRE do **1º prêmio** — ou, se o 1º for eliminado
+      (milhar 0000), do 1º prêmio válido na ordem. NÃO se usa o prêmio
+      "mais próximo" entre os 5: só o 1º prêmio ancora a aproximação.
     """
     linhas: list[PremioAnalise] = []
     for i, bilhete in enumerate(premios, start=1):
@@ -127,8 +133,18 @@ def analisar(cota: int, regra: RegraGrupo, premios: list[str]) -> Analise:
                                     cota_sorteada, exibicao, dist, direcao))
 
     validas = [l for l in linhas if l.distancia is not None]
-    melhor = min(validas, key=lambda l: (l.distancia, l.ordem)) if validas else None
-    contemplado = melhor is not None and melhor.distancia == 0
+    # Contemplação direta: a cota bate exatamente com algum dos 5 prêmios.
+    # Entre acertos, preferência pela menor ordem (1º antes do 2º…).
+    exatas = [l for l in validas if l.distancia == 0]
+    if exatas:
+        melhor = min(exatas, key=lambda l: l.ordem)
+        contemplado = True
+    else:
+        # Sem acerto exato: a aproximação ancora SEMPRE no 1º prêmio (ou no
+        # 1º prêmio válido, se o 1º for eliminado). `validas` está em ordem
+        # de prêmio, então o primeiro é a âncora.
+        melhor = validas[0] if validas else None
+        contemplado = False
     ordem = melhor.ordem if contemplado else None
     return Analise(contemplado=contemplado, ordem_contemplada=ordem,
                    premios=linhas, melhor=melhor)
