@@ -1,15 +1,19 @@
 """Busca o resultado da Loteria Federal com fontes em cascata.
 
-1. API JSON oficial da Caixa (servicebus2) — bloqueia IPs de datacenter
-   estrangeiro (403 no Render), mas é a fonte canônica quando acessível.
-2. Espelho comunitário loteriascaixa-api — mesmos dados, sem geo-bloqueio.
+1. API JSON oficial da Caixa (servicebus2) — fonte canônica e sempre fresca,
+   mas bloqueia IPs de datacenter estrangeiro (403 a partir do servidor).
+2. Caixa via proxy público (allorigins) — mesma resposta oficial, mas buscada
+   pela infra do proxy, contornando o geo-bloqueio. Fresca como a oficial.
+3. Espelho comunitário loteriascaixa-api — último recurso; costuma ficar
+   defasado em dias, então só vale quando bate com a data esperada.
 """
 from __future__ import annotations
 
 import logging
 import re
 import time
-from datetime import datetime
+from datetime import date, datetime
+from urllib.parse import quote
 
 import requests
 
@@ -18,6 +22,7 @@ from .models import ResultadoLoteria
 log = logging.getLogger(__name__)
 
 URL_CAIXA = "https://servicebus2.caixa.gov.br/portaldeloterias/api/federal"
+URL_CAIXA_PROXY = "https://api.allorigins.win/raw?url=" + quote(URL_CAIXA, safe="")
 URL_ESPELHO = "https://loteriascaixa-api.herokuapp.com/api/federal/latest"
 HEADERS = {
     "Accept": "application/json",
@@ -61,24 +66,40 @@ def _parse_espelho(dados: dict) -> ResultadoLoteria:
 
 FONTES = [
     ("caixa", URL_CAIXA, _parse_caixa),
+    ("caixa-proxy", URL_CAIXA_PROXY, _parse_caixa),
     ("espelho", URL_ESPELHO, _parse_espelho),
 ]
 
 
-def buscar_resultado() -> ResultadoLoteria:
-    """Último resultado da Federal. Levanta LoteriaIndisponivel se todas as
-    fontes falharem em todas as rodadas."""
+def buscar_resultado(data_esperada: date | None = None) -> ResultadoLoteria:
+    """Último resultado da Federal, em cascata.
+
+    Quando `data_esperada` é dada, devolve a primeira fonte cujo resultado bate
+    com essa data — assim um espelho defasado nunca mascara um sorteio já
+    publicado na Caixa. Sem nenhum match exato, devolve o resultado mais recente
+    que conseguiu obter (e quem chama decide se serve). Levanta
+    LoteriaIndisponivel só se nenhuma fonte responder.
+    """
     ultimo_erro: Exception | None = None
+    candidatos: list[ResultadoLoteria] = []
     for rodada in range(1, RODADAS + 1):
         for nome, url, parse in FONTES:
             try:
                 resp = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
                 resp.raise_for_status()
-                return parse(resp.json())
+                res = parse(resp.json())
             except Exception as exc:  # rede, JSON, schema — tenta a próxima
                 ultimo_erro = exc
                 log.warning("Fonte %s falhou (rodada %s/%s): %s",
                             nome, rodada, RODADAS, exc)
+                continue
+            if data_esperada is None or res.data == data_esperada:
+                return res
+            log.info("Fonte %s trouxe %s, esperado %s — defasada, seguindo",
+                     nome, res.data, data_esperada)
+            candidatos.append(res)
         if rodada < RODADAS:
             time.sleep(2 * rodada)
+    if candidatos:  # nenhuma bateu a data; devolve a mais recente obtida
+        return max(candidatos, key=lambda r: r.data)
     raise LoteriaIndisponivel(str(ultimo_erro))

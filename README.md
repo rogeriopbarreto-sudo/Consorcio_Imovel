@@ -42,7 +42,9 @@ O free tier do Render hiberna; use um cron externo (ex.: [cron-job.org](https://
 GET https://SEU-APP.onrender.com/run-check?secret=SEU_CRON_SECRET
 ```
 
-diariamente às **19h, 20h, 21h, 22h e 23h** (America/Sao_Paulo). Fora das datas de extração a resposta é `{"status": "sem_extracao_hoje"}` e nada acontece. As notificações têm dedup por (data, consórcio): chamadas repetidas não geram mensagem duplicada.
+**a cada 30 minutos das 20h às 23h30, quartas e sábados** (America/Sao_Paulo) — cron `*/30 20-23 * * 3,6`. Os sorteios da Federal saem ~19h em quartas e sábados (todas as 21 extrações de 2026 caem nesses dias); a janela 20h–23h30 cobre atrasos de publicação. Fora das datas de extração a resposta é `{"status": "sem_extracao_hoje"}` e nada acontece — o app se auto-filtra pelo calendário. As notificações têm dedup por (data, consórcio): chamadas repetidas não geram mensagem duplicada.
+
+**Fonte do resultado (cascata, com descarte de defasados):** a API oficial da Caixa é a mais fresca, mas bloqueia IPs de datacenter estrangeiro (403 a partir do servidor). O app tenta, em ordem: (1) Caixa direta, (2) Caixa via proxy `allorigins` — mesma resposta oficial e fresca, buscada pela infra do proxy, contornando o geo-bloqueio, (3) espelho comunitário (último recurso, costuma atrasar dias). Em datas de extração o app exige que a fonte bata com a data esperada, então um espelho defasado nunca mascara um sorteio já publicado.
 
 ## Testes manuais
 

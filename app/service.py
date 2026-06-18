@@ -28,6 +28,14 @@ def hoje_tz() -> date:
     return datetime.now(ZoneInfo(settings.app_timezone)).date()
 
 
+def agora_tz() -> datetime:
+    return datetime.now(ZoneInfo(settings.app_timezone))
+
+
+def _fmt_horario(dt: datetime | None = None) -> str:
+    return (dt or agora_tz()).strftime("%d/%m/%Y às %H:%M")
+
+
 def calendario() -> list[EventoCalendario]:
     """Calendário da aba `calendario` do Sheets; fallback no JSON local."""
     if sheets.configurado():
@@ -75,6 +83,7 @@ def _mensagem_telegram(cons: Consorcio, analise: matching.Analise,
                 if e.consorcio_id == cons.id and e.extracao > res.data]
     if proximos:
         corpo += f"\n\n📅 Próxima extração: {_fmt_data(proximos[0].extracao)}"
+    corpo += f"\n\n🕒 Verificado em {_fmt_horario()}"
     return cab + corpo
 
 
@@ -150,6 +159,7 @@ def _avisar_falha(d: date, motivo: str) -> None:
     except Exception:
         pass
     if telegram.enviar(f"⚠️ <b>Consórcios Control</b>\n{motivo}\n"
+                       f"🕒 Verificado em {_fmt_horario()}\n"
                        f"Use o input manual no dashboard se necessário."):
         try:
             if sheets.configurado():
@@ -174,7 +184,7 @@ def run_check(force: bool = False, data_str: str | None = None) -> dict:
         alvos = todos
 
     try:
-        res = loteria.buscar_resultado()
+        res = loteria.buscar_resultado(data_esperada=d)
     except loteria.LoteriaIndisponivel as exc:
         _avisar_falha(d, f"API da Caixa indisponível em {_fmt_data(d)}: {exc}")
         return {"status": "loteria_indisponivel", "data": d.isoformat(),
