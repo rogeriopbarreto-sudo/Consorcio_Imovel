@@ -59,6 +59,20 @@ def _fmt_data(d: date) -> str:
     return d.strftime("%d/%m/%Y")
 
 
+def _linha_primeiro_premio(cons: Consorcio, analise: matching.Analise) -> str | None:
+    """Linha do 1º prêmio da Federal (bilhete completo) e sua distância à cota."""
+    p1 = next((p for p in analise.premios if p.ordem == 1), None)
+    if p1 is None:
+        return None
+    if p1.distancia is not None:
+        return (f"1º prêmio: {p1.bilhete}, {cons.unidade} <b>{p1.numero}</b> "
+                f"— a <b>{p1.distancia}</b> ({p1.direcao}) do seu "
+                f"<b>{p1.numero_usuario}</b>.")
+    if p1.eliminado:
+        return f"1º prêmio: {p1.bilhete}, {cons.unidade} {p1.numero} (eliminada)."
+    return f"1º prêmio: {p1.bilhete} (sem {cons.unidade} válida)."
+
+
 def _mensagem_telegram(cons: Consorcio, analise: matching.Analise,
                        res: ResultadoLoteria) -> str:
     cab = (f"🎰 <b>Loteria Federal {_fmt_data(res.data)}</b> "
@@ -73,10 +87,13 @@ def _mensagem_telegram(cons: Consorcio, analise: matching.Analise,
                  f"⚠️ Análise matemática — confirme com a Ademicon.")
     elif analise.melhor is not None:
         m = analise.melhor
-        corpo = (f"Não foi dessa vez.\n"
-                 f"Mais perto: {m.ordem}º prêmio, {cons.unidade} "
-                 f"<b>{m.numero}</b> — a <b>{m.distancia}</b> "
-                 f"({m.direcao}) do seu <b>{m.numero_usuario}</b>.")
+        corpo = "Não foi dessa vez.\n"
+        linha1 = _linha_primeiro_premio(cons, analise)
+        if linha1:
+            corpo += linha1 + "\n"
+        corpo += (f"Mais perto: {m.ordem}º prêmio, {cons.unidade} "
+                  f"<b>{m.numero}</b> — a <b>{m.distancia}</b> "
+                  f"({m.direcao}) do seu <b>{m.numero_usuario}</b>.")
     else:
         corpo = "Nenhum prêmio válido para análise nesta extração."
     proximos = [e for e in proximos_eventos(res.data)
