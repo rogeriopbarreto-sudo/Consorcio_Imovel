@@ -34,15 +34,30 @@ Tudo é editável: regras em `data/consorcios.json`, calendário em `data/calend
 2. Preencha as variáveis de ambiente no painel (as mesmas do `.env.example`).
 3. O serviço sobe com `uvicorn app.main:app`.
 
-### 4. Cron externo
+### 4. Scheduler (tick a cada 10 min)
 
-O free tier do Render hiberna; use um cron externo (ex.: [cron-job.org](https://cron-job.org)) chamando:
+Um **Scheduled Task do Coolify** dispara o ciclo de busca. Na aplicação, em
+**Scheduled Tasks**, use uma tarefa com:
 
-```
-GET https://SEU-APP.onrender.com/run-check?secret=SEU_CRON_SECRET
-```
+- **Command:** `curl -fsS "https://consorcio.barreto.ai/run-check?secret=SEU_CRON_SECRET"`
+- **Frequency:** `*/10 * * * *` (a cada 10 min, todo dia)
+- **Timeout:** 300
 
-**a cada 30 minutos das 20h às 23h30, quartas e sábados** (America/Sao_Paulo) — cron `*/30 20-23 * * 3,6`. Os sorteios da Federal saem ~19h em quartas e sábados (todas as 21 extrações de 2026 caem nesses dias); a janela 20h–23h30 cobre atrasos de publicação. Fora das datas de extração a resposta é `{"status": "sem_extracao_hoje"}` e nada acontece — o app se auto-filtra pelo calendário. As notificações têm dedup por (data, consórcio): chamadas repetidas não geram mensagem duplicada.
+O curl bate no `/run-check` público (mesmo processo web → dashboard em memória
+fica fresco). Alternativa via localhost, sem passar pela internet:
+`python scripts/tick.py` (lê `PORT`/`CRON_SECRET` do ambiente).
+
+> A agenda **não** deve restringir dia nem hora. **Todo o gate vive no app** —
+> por isso o scheduler dispara sempre de 10 em 10 min sem lidar com fuso/UTC no
+> cron (a janela é BRT e cruzaria a meia-noite UTC, bagunçando o dia da semana):
+
+- **Dia de sorteio:** fora das datas de extração → `{"status": "sem_extracao_hoje"}`, no-op (auto-filtro pelo calendário).
+- **Janela de horário:** só age entre `BUSCA_HORA_INICIO` e `BUSCA_HORA_FIM` (padrão 20h–22h BRT). Fora dela → `{"status": "fora_da_janela"}`.
+- **Ciclo de tentativas:** dentro da janela, cada tick é uma tentativa. Achou o resultado do dia → processa, manda a mensagem programada e encerra. Não achou → manda "Tentativa N/10, tento de novo em ~10 min" no Telegram e agenda a próxima, até `BUSCA_MAX_TENTATIVAS` (padrão 10); no limite manda o aviso de encerramento e para. Contador em memória (os ticks batem no mesmo processo web).
+
+As notificações de resultado têm dedup por (data, consórcio) no Sheets; chamadas
+repetidas não geram mensagem programada duplicada. Ajuste a janela/limite via
+`BUSCA_HORA_INICIO`, `BUSCA_HORA_FIM`, `BUSCA_MAX_TENTATIVAS` no ambiente.
 
 **Fonte do resultado (cascata, com descarte de defasados):** a API oficial da Caixa é a mais fresca, mas bloqueia IPs de datacenter estrangeiro (403 a partir do servidor). O app tenta, em ordem: (1) Caixa direta, (2) Caixa via proxy `allorigins` — mesma resposta oficial e fresca, buscada pela infra do proxy, contornando o geo-bloqueio, (3) espelho comunitário (último recurso, costuma atrasar dias). Em datas de extração o app exige que a fonte bata com a data esperada, então um espelho defasado nunca mascara um sorteio já publicado.
 
@@ -58,7 +73,7 @@ GET https://SEU-APP.onrender.com/run-check?secret=SEU_CRON_SECRET
 | Rota | Descrição |
 | :--- | :--- |
 | `GET /` | Dashboard |
-| `GET/POST /run-check?secret=&force=&date=` | Pipeline completo (cron) — exige `CRON_SECRET` |
+| `GET/POST /run-check?secret=&force=&date=` | Uma tentativa de busca (tick do scheduler) — exige `CRON_SECRET` |
 | `POST /api/refresh` | Atualização manual via dashboard |
 | `POST /manual-result` | Input manual dos 5 prêmios |
 | `GET /calendario` | Calendário em JSON |

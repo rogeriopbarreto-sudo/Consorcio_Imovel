@@ -25,6 +25,13 @@ class Settings(BaseSettings):
     cron_secret: str = ""
     app_timezone: str = "America/Sao_Paulo"
 
+    # Janela de busca do resultado nos dias de sorteio (hora local BRT).
+    # O app tenta a cada tick do scheduler enquanto hora ∈ [inicio, fim),
+    # até achar o resultado ou esgotar `busca_max_tentativas`.
+    busca_hora_inicio: int = 20
+    busca_hora_fim: int = 22
+    busca_max_tentativas: int = 10
+
 
 settings = Settings()
 

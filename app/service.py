@@ -18,6 +18,14 @@ ESTADO: dict = {
     "analises": {},           # consorcio_id -> matching.Analise
     "atualizado_em": None,    # datetime
     "erro": None,             # str | None
+    # Sessão de busca do dia: os ticks do scheduler batem no processo web,
+    # então este contador sobrevive entre tentativas sem depender do Sheets.
+    "busca": {
+        "data": None,         # date da sessão corrente
+        "tentativas": 0,      # tentativas sem resultado já notificadas
+        "resolvido": False,   # resultado encontrado e processado
+        "encerrada": False,   # atingiu o limite de tentativas
+    },
 }
 
 MESES_PT = ["", "janeiro", "fevereiro", "março", "abril", "maio", "junho",
@@ -179,29 +187,72 @@ def _processar(res: ResultadoLoteria, alvos: list[Consorcio]) -> dict:
     return resumo
 
 
-def _avisar_falha(d: date, motivo: str) -> None:
-    """Aviso de falha no Telegram, no máximo 1x por data."""
+def _dentro_janela(agora: datetime) -> bool:
+    """Hora local dentro da janela de busca do dia de sorteio."""
+    return settings.busca_hora_inicio <= agora.hour < settings.busca_hora_fim
+
+
+def _reset_busca(d: date) -> dict:
+    """Zera a sessão de busca ao virar o dia; devolve o estado corrente."""
+    b = ESTADO["busca"]
+    if b["data"] != d:
+        b.update(data=d, tentativas=0, resolvido=False, encerrada=False)
+    return b
+
+
+def _msg_tentativa(d: date, n: int, maxt: int, motivo: str) -> str:
+    return (f"🔍 <b>Consórcios Control</b> — busca do dia\n"
+            f"Tentativa <b>{n}/{maxt}</b>: resultado da Loteria Federal para "
+            f"{_fmt_data(d)} ainda não publicado.\n"
+            f"{motivo}\n"
+            f"Tento de novo em ~10 min.\n"
+            f"🕒 {_fmt_horario()}")
+
+
+def _msg_encerrada(d: date, maxt: int) -> str:
+    return (f"⛔ <b>Consórcios Control</b>\n"
+            f"Encerrei a busca de hoje após {maxt} tentativas — o resultado de "
+            f"{_fmt_data(d)} não saiu a tempo.\n"
+            f"Assim que sair, use o botão <b>Atualizar agora</b> ou o input "
+            f"manual no dashboard.\n"
+            f"🕒 {_fmt_horario()}")
+
+
+def _sem_resultado(d: date, motivo: str, force: bool) -> dict:
+    """Trata um tick sem resultado.
+
+    Nos ticks automáticos conta uma tentativa, avisa no Telegram e encerra a
+    sessão ao atingir o limite. Em chamada manual (force) só devolve o status,
+    sem contar tentativa nem spammar.
+    """
     ESTADO["erro"] = motivo
-    try:
-        if sheets.configurado() and sheets.ja_notificado(d, "_falha"):
-            return
-    except Exception:
-        pass
-    if telegram.enviar(f"⚠️ <b>Consórcios Control</b>\n{motivo}\n"
-                       f"🕒 Verificado em {_fmt_horario()}\n"
-                       f"Use o input manual no dashboard se necessário."):
-        try:
-            if sheets.configurado():
-                sheets.registrar_notificacao(d, "_falha")
-        except Exception:
-            pass
+    if force:
+        return {"status": "sem_resultado", "data": d.isoformat(),
+                "motivo": motivo}
+    b = ESTADO["busca"]
+    maxt = settings.busca_max_tentativas
+    b["tentativas"] += 1
+    n = b["tentativas"]
+    telegram.enviar(_msg_tentativa(d, n, maxt, motivo))
+    if n >= maxt:
+        b["encerrada"] = True
+        telegram.enviar(_msg_encerrada(d, maxt))
+    if sheets.configurado():
+        sheets.log_evento("busca", f"data={d} tentativa={n}/{maxt} {motivo}")
+    return {"status": "aguardando_resultado", "data": d.isoformat(),
+            "tentativa": n, "max": maxt, "encerrada": b["encerrada"]}
 
 
 def run_check(force: bool = False, data_str: str | None = None) -> dict:
-    """Entrada principal (cron externo e botão Atualizar).
+    """Entrada principal — chamada pelo scheduler (tick a cada 10 min) e pelo
+    botão Atualizar.
 
-    force=True analisa mesmo sem extração no calendário e aceita
-    resultado de data diferente da esperada.
+    Nos dias de sorteio, dentro da janela `busca_hora_inicio`..`busca_hora_fim`,
+    cada tick é uma tentativa: acha o resultado → processa e encerra; não acha →
+    avisa no Telegram e agenda a próxima, até `busca_max_tentativas`.
+
+    force=True (dashboard/manual) ignora dia, janela e limite de tentativas e
+    aceita resultado de data diferente da esperada.
     """
     d = date.fromisoformat(data_str) if data_str else hoje_tz()
     eventos = eventos_na_data(d)
@@ -212,20 +263,26 @@ def run_check(force: bool = False, data_str: str | None = None) -> dict:
             return {"status": "sem_extracao_hoje", "data": d.isoformat()}
         alvos = todos
 
+    b = _reset_busca(d)
+    if not force:
+        if b["resolvido"] or b["encerrada"]:
+            return {"status": "busca_encerrada", "data": d.isoformat(),
+                    "resolvido": b["resolvido"]}
+        if not _dentro_janela(agora_tz()):
+            return {"status": "fora_da_janela", "data": d.isoformat()}
+
     try:
         res = loteria.buscar_resultado(data_esperada=d)
     except loteria.LoteriaIndisponivel as exc:
-        _avisar_falha(d, f"API da Caixa indisponível em {_fmt_data(d)}: {exc}")
-        return {"status": "loteria_indisponivel", "data": d.isoformat(),
-                "erro": str(exc)}
+        return _sem_resultado(d, f"API da Caixa indisponível: {exc}", force)
 
     if res.data != d and not force:
-        _avisar_falha(d, f"Resultado ainda não apurado para {_fmt_data(d)} "
-                         f"(último: {_fmt_data(res.data)}).")
-        return {"status": "resultado_de_outra_data", "data": d.isoformat(),
-                "data_apuracao": res.data.isoformat()}
+        return _sem_resultado(
+            d, f"Última apuração disponível ainda é {_fmt_data(res.data)}.",
+            force)
 
     resumo = _processar(res, alvos)
+    b["resolvido"] = True
     return {"status": "ok", "data": res.data.isoformat(),
             "concurso": res.concurso, "origem": res.origem,
             "analises": resumo}
