@@ -282,7 +282,10 @@ def run_check(force: bool = False, data_str: str | None = None) -> dict:
             force)
 
     resumo = _processar(res, alvos)
-    b["resolvido"] = True
+    # Só encerra o dia quando o resultado é o da data esperada. Um force que
+    # pegou um resultado antigo (latest atrasado) não deve travar o ciclo.
+    if res.data == d:
+        b["resolvido"] = True
     return {"status": "ok", "data": res.data.isoformat(),
             "concurso": res.concurso, "origem": res.origem,
             "analises": resumo}
